@@ -19,7 +19,7 @@ struct User {
     password: String
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct Login {
     username: String,
     password: String
@@ -73,13 +73,19 @@ async fn login(valuser: web::Json<Login>) -> impl Responder {
         Err(_) => panic!("Connection failed"),
     };
 
-    match conn.exec("SELECT uusername, upassword FROM users WHERE username = ?", valuser.username) {
-        Ok(ret) => println!("{:?}", ret),
+    let res= match conn.exec_first("SELECT uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &valuser.username}).map(|row| { row.map(|(uusername, upassword)| Login { username: uusername, password: upassword }) }) {
+        Ok(ret) => ret,
         Err(err) => panic!("{err}"),
+    };
+    if res.is_none() {
+        HttpResponse::NotFound()
+    } else {
+        if res.unwrap().password == valuser.password {
+            HttpResponse::Ok()
+        } else {
+            HttpResponse::BadRequest()
+        }
     }
-    println!("username: {}, password: {}", valuser.username, valuser.password);
-    //let dbuser = 
-    HttpResponse::BadRequest()
 }
 
 //Testmethods - remove
