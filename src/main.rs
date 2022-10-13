@@ -1,4 +1,4 @@
-use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, HttpRequest};
+use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, HttpRequest, http::StatusCode};
 use serde::*;
 use mysql::*;
 use mysql::prelude::*;
@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-#[post("/adduser")]
+#[post("/user/add")]
 async fn adduser(params: web::Json<User>) -> impl Responder {
     let pool = match  Pool::new(SQL) {
         Ok(pret) => pret,
@@ -54,14 +54,12 @@ async fn adduser(params: web::Json<User>) -> impl Responder {
     };
 
     match conn.exec_drop("INSERT INTO users(uusername, uemail, upassword) VALUES (?, ?, ?)", (&params.username, &params.email, &params.password)) {
-        Ok(ret) => println!("{:?}", ret),
-        Err(err) => panic!("{err}"),
-    }
-    println!("username: {}\nemail: {}\npassword: {}\n", params.username, params.email, params.password);
-    HttpResponse::Ok()
+        Ok(_) => return HttpResponse::new(StatusCode::from_u16(200).unwrap()),
+        Err(_) => return HttpResponse::new(StatusCode::from_u16(452).unwrap()),
+    };
 }
 
-#[post("/login")]
+#[post("/user/login")]
 async fn login(valuser: web::Json<Login>) -> impl Responder {
     let pool = match  Pool::new(SQL) {
         Ok(pret) => pret,
@@ -78,12 +76,12 @@ async fn login(valuser: web::Json<Login>) -> impl Responder {
         Err(err) => panic!("{err}"),
     };
     if res.is_none() {
-        HttpResponse::NotFound()
+        HttpResponse::new(StatusCode::from_u16(452).unwrap())
     } else {
         if res.unwrap().password == valuser.password {
-            HttpResponse::Ok()
+            HttpResponse::new(StatusCode::from_u16(200).unwrap())
         } else {
-            HttpResponse::BadRequest()
+            HttpResponse::new(StatusCode::from_u16(426).unwrap())
         }
     }
 }
