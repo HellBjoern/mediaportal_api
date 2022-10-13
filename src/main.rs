@@ -1,8 +1,11 @@
-use actix_web::http::StatusCode;
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, HttpRequest};
 use serde::*;
 use mysql::*;
 use mysql::prelude::*;
+
+static IP: &str = "127.0.0.1";
+static PORT: u16 = 8080;
+static SQL: &str = "mysql://user:password@127.0.0.1:3306/mediaportal";
 
 #[derive(Deserialize, Debug)]
 struct Request {
@@ -25,9 +28,7 @@ struct Login {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let ip = "127.0.0.1";
-    let port = 8080;
-    println!("Starting api on {}:{}", ip, port);
+    println!("Starting api on {}:{}", IP, PORT);
     HttpServer::new(|| {
         App::new()
             .service(hello)
@@ -35,16 +36,14 @@ async fn main() -> std::io::Result<()> {
             .service(login)
             .service(testpost)
     })
-    .bind((ip, port))?
+    .bind((IP, PORT))?
     .run()
     .await
 }
 
 #[post("/adduser")]
 async fn adduser(params: web::Json<User>) -> impl Responder {
-    let url = "mysql://user:password@127.0.0.1:3306/mediaportal";
-    
-    let pool = match  Pool::new(url) {
+    let pool = match  Pool::new(SQL) {
         Ok(pret) => pret,
         Err(_) => panic!("Pool broken"),
     };
@@ -54,7 +53,7 @@ async fn adduser(params: web::Json<User>) -> impl Responder {
         Err(_) => panic!("Connection failed"),
     };
 
-    match conn.exec_drop("INSERT INTO user(uusername, uemail, upassword) VALUES (?, ?, ?)", (&params.username, &params.email, &params.password)) {
+    match conn.exec_drop("INSERT INTO users(uusername, uemail, upassword) VALUES (?, ?, ?)", (&params.username, &params.email, &params.password)) {
         Ok(ret) => println!("{:?}", ret),
         Err(err) => panic!("{err}"),
     }
@@ -63,8 +62,23 @@ async fn adduser(params: web::Json<User>) -> impl Responder {
 }
 
 #[post("/login")]
-async fn login(params: web::Json<Login>) -> impl Responder {
-    println!("username: {}, password: {}\n", params.username, params.password);
+async fn login(valuser: web::Json<Login>) -> impl Responder {
+    let pool = match  Pool::new(SQL) {
+        Ok(pret) => pret,
+        Err(_) => panic!("Pool broken"),
+    };
+
+    let mut conn = match pool.get_conn() {
+        Ok(pooled_con) => pooled_con,
+        Err(_) => panic!("Connection failed"),
+    };
+
+    match conn.exec("SELECT uusername, upassword FROM users WHERE username = ?", valuser.username) {
+        Ok(ret) => println!("{:?}", ret),
+        Err(err) => panic!("{err}"),
+    }
+    println!("username: {}, password: {}", valuser.username, valuser.password);
+    //let dbuser = 
     HttpResponse::BadRequest()
 }
 
