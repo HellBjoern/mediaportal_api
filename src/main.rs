@@ -1,7 +1,6 @@
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, http::StatusCode};
-use serde::*;
-use mysql::*;
-use mysql::prelude::*;
+use mysql::{Pool, prelude::Queryable, params};
+use serde::Deserialize;
 
 //Hosting on Localhost
 static IP: &str = "127.0.0.1";
