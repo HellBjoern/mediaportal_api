@@ -43,7 +43,7 @@ CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
 Grant privileges to user:
 
 ```sql
-GRANT ALL PRIVILEGES ON * TO 'username'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost';
 ```
 
 Clone and cd into git tree:
