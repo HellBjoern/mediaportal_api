@@ -18,10 +18,12 @@ Example Data:
 
 Statuscodes
 
-| Code | Meaning         |
-| ---- | --------------- |
-| 200  | Ok              |
-| 452  | Error Inserting |
+| Code | Meaning                       |
+| ---- | ----------------------------- |
+| 200  | Ok                            |
+| 452  | Error while creating DB Pool  |
+| 453  | Could not connect to Pool     |
+| 454  | Error while inserting into DB |
 
 ---
 
@@ -41,8 +43,10 @@ Example Data:
 
 Statuscodes
 
-| Code | Meaning                 |
-| ---- | ----------------------- |
-| 200  | Ok                      |
-| 452  | Username does not exist |
-| 453  | Wrong password          |
+| Code | Meaning                      |
+| ---- | ---------------------------- |
+| 200  | Ok                           |
+| 452  | Error while creating DB Pool |
+| 453  | Could not connect to Pool    |
+| 454  | User does not exist          |
+| 455  | Passwords do not match       |

@@ -1,4 +1,4 @@
-use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, HttpRequest, http::StatusCode};
+use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, http::StatusCode};
 use serde::*;
 use mysql::*;
 use mysql::prelude::*;
@@ -6,11 +6,6 @@ use mysql::prelude::*;
 static IP: &str = "127.0.0.1";
 static PORT: u16 = 8080;
 static SQL: &str = "mysql://user:password@127.0.0.1:3306/mediaportal";
-
-#[derive(Deserialize, Debug)]
-struct Request {
-    text: String
-}
 
 #[derive(Deserialize)]
 struct User {
@@ -31,10 +26,8 @@ async fn main() -> std::io::Result<()> {
     println!("Starting api on {}:{}", IP, PORT);
     HttpServer::new(|| {
         App::new()
-            .service(hello)
             .service(adduser)
             .service(login)
-            .service(testpost)
     })
     .bind((IP, PORT))?
     .run()
@@ -45,17 +38,23 @@ async fn main() -> std::io::Result<()> {
 async fn adduser(params: web::Json<User>) -> impl Responder {
     let pool = match  Pool::new(SQL) {
         Ok(pret) => pret,
-        Err(_) => panic!("Pool broken"),
+        Err(err) => {
+            println!("Could not create Pool; Error:\n{:?}", err);
+            return HttpResponse::new(StatusCode::from_u16(452).unwrap())
+        },
     };
 
     let mut conn = match pool.get_conn() {
         Ok(pooled_con) => pooled_con,
-        Err(_) => panic!("Connection failed"),
+        Err(err) => {
+            println!("Connection failed; Error:\n{:?}", err);
+            return HttpResponse::new(StatusCode::from_u16(453).unwrap());
+        },
     };
 
     match conn.exec_drop("INSERT INTO users(uusername, uemail, upassword) VALUES (?, ?, ?)", (&params.username, &params.email, &params.password)) {
         Ok(_) => return HttpResponse::new(StatusCode::from_u16(200).unwrap()),
-        Err(_) => return HttpResponse::new(StatusCode::from_u16(452).unwrap()),
+        Err(_) => return HttpResponse::new(StatusCode::from_u16(454).unwrap()),
     };
 }
 
@@ -63,48 +62,31 @@ async fn adduser(params: web::Json<User>) -> impl Responder {
 async fn login(valuser: web::Json<Login>) -> impl Responder {
     let pool = match  Pool::new(SQL) {
         Ok(pret) => pret,
-        Err(_) => panic!("Pool broken"),
+        Err(err) => {
+            println!("Could not create Pool; Error:\n{:?}", err);
+            return HttpResponse::new(StatusCode::from_u16(452).unwrap())
+        },
     };
 
     let mut conn = match pool.get_conn() {
         Ok(pooled_con) => pooled_con,
-        Err(_) => panic!("Connection failed"),
+        Err(err) => {
+            println!("Connection failed; Error:\n{:?}", err);
+            return HttpResponse::new(StatusCode::from_u16(453).unwrap());
+        },
     };
 
     let res= match conn.exec_first("SELECT uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &valuser.username}).map(|row| { row.map(|(uusername, upassword)| Login { username: uusername, password: upassword }) }) {
         Ok(ret) => ret,
-        Err(err) => panic!("{err}"),
+        Err(_) => None,
     };
     if res.is_none() {
-        HttpResponse::new(StatusCode::from_u16(452).unwrap())
+        return HttpResponse::new(StatusCode::from_u16(454).unwrap());
+    }
+    if res.unwrap().password == valuser.password {
+        HttpResponse::new(StatusCode::from_u16(200).unwrap())
     } else {
-        if res.unwrap().password == valuser.password {
-            HttpResponse::new(StatusCode::from_u16(200).unwrap())
-        } else {
-            HttpResponse::new(StatusCode::from_u16(426).unwrap())
-        }
+        HttpResponse::new(StatusCode::from_u16(455).unwrap())
     }
 }
 
-//Testmethods - remove
-
-#[derive(Deserialize)]
-struct Test {
-    value: String
-}
-
-#[post("/testpost")]
-async fn testpost(params: web::Json<Test>) -> impl Responder {
-    if params.value == "true" {
-        HttpResponse::Ok().body("True")
-    } else {
-        HttpResponse::BadRequest().body("Hin")
-    }
-}
-
-#[post("/")]
-async fn hello(req: HttpRequest) -> impl Responder {
-    let params = web::Query::<Request>::from_query(req.query_string()).unwrap();
-    println!("{:?}", params.text);
-    HttpResponse::Ok().body("ostia")
-}
