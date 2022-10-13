@@ -46,10 +46,22 @@ Grant privileges to user:
 GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost';
 ```
 
+Exit mariadb:
+
+```sql
+quit
+```
+
 Clone and cd into git tree:
 
 ```
 git clone https://github.com/HellBjoern/mediaportal_api && cd mediaportal_api
+```
+
+Edit src/main.rs static SQL to match your username and password for SQL:
+
+```shell
+vim src/main.rs
 ```
 
 Build:

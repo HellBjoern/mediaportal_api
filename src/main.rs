@@ -3,8 +3,11 @@ use serde::*;
 use mysql::*;
 use mysql::prelude::*;
 
+//Hosting on Localhost
 static IP: &str = "127.0.0.1";
+//API Port
 static PORT: u16 = 8080;
+//Database connection
 static SQL: &str = "mysql://user:password@127.0.0.1:3306/mediaportal";
 
 #[derive(Deserialize)]
@@ -19,7 +22,6 @@ struct Login {
     username: String,
     password: String
 }
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
