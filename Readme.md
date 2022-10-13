@@ -1,5 +1,39 @@
 # API Documentation
 
+## Build instructions
+
+### Linux
+
+install rustup f.e:
+
+```shell
+yay -S rustup
+```
+
+setup the rustup toolchain:
+
+```shell
+rustup toolchain install nightly
+```
+
+clone and cd into git tree:
+
+```
+git clone https://github.com/HellBjoern/mediaportal_api && cd mediaportal_api
+```
+
+build:
+
+```shell
+cargo build
+```
+
+run:
+
+```shell
+cargo run
+```
+
 ---
 
 ## Add
