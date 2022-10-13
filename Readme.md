@@ -4,16 +4,46 @@
 
 ### Linux
 
-Install rustup e.g:
+Install rustup and mariadb e.g:
 
 ```shell
-yay -S rustup
+yay -S rustup mariadb
 ```
 
 Setup the rustup toolchain:
 
 ```shell
 rustup toolchain install nightly
+```
+
+Setup mariadb:
+
+```shell
+mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+```
+
+Start mariadb:
+
+```shell
+systemctl start mariadb
+```
+
+Connect to mariadb:
+
+```shell
+sudo mysql -u root -p
+```
+
+Add SQL user:
+
+```sql
+CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
+```
+
+Grant privileges to user:
+
+```sql
+GRANT ALL PRIVILEGES ON * TO 'username'@'localhost';
 ```
 
 Clone and cd into git tree:
