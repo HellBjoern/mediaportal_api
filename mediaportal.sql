@@ -22,8 +22,7 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
-CREATE DATABASE mediaportal;
-USE mediaportal;
+
 --
 -- Tabellenstruktur für Tabelle `media`
 --

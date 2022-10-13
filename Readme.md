@@ -16,6 +16,12 @@ Setup the rustup toolchain:
 rustup toolchain install nightly
 ```
 
+Clone and cd into git tree:
+
+```
+git clone https://github.com/HellBjoern/mediaportal_api && cd mediaportal_api
+```
+
 Setup mariadb:
 
 ```shell
@@ -46,16 +52,28 @@ Grant privileges to user:
 GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost';
 ```
 
+Create database:
+
+```sql
+CREATE DATABASE db_name;
+```
+
+Use new Database:
+
+```sql
+USE db_name;
+```
+
+Import tables:
+
+```sql
+SOURCE mediaportal.sql;
+```
+
 Exit mariadb:
 
 ```sql
-quit;
-```
-
-Clone and cd into git tree:
-
-```
-git clone https://github.com/HellBjoern/mediaportal_api && cd mediaportal_api
+QUIT;
 ```
 
 Edit src/main.rs static SQL to match your username and password for SQL:
