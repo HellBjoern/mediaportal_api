@@ -4,31 +4,31 @@
 
 ### Linux
 
-install rustup e.g:
+Install rustup e.g:
 
 ```shell
 yay -S rustup
 ```
 
-setup the rustup toolchain:
+Setup the rustup toolchain:
 
 ```shell
 rustup toolchain install nightly
 ```
 
-clone and cd into git tree:
+Clone and cd into git tree:
 
 ```
 git clone https://github.com/HellBjoern/mediaportal_api && cd mediaportal_api
 ```
 
-build:
+Build:
 
 ```shell
 cargo build
 ```
 
-run:
+Run:
 
 ```shell
 cargo run

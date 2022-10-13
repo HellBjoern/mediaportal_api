@@ -89,4 +89,3 @@ async fn login(valuser: web::Json<Login>) -> impl Responder {
         HttpResponse::new(StatusCode::from_u16(455).unwrap())
     }
 }
-
