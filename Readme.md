@@ -94,6 +94,10 @@ Run:
 cargo run
 ```
 
+### Windows
+
+- [ ]  Coming soon
+
 ---
 
 ## Add
