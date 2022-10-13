@@ -4,7 +4,7 @@
 
 ### Linux
 
-install rustup f.e:
+install rustup e.g:
 
 ```shell
 yay -S rustup
