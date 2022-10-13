@@ -1,3 +1,4 @@
+use actix_web::http::StatusCode;
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, HttpRequest};
 use serde::*;
 use mysql::*;
@@ -15,16 +16,26 @@ struct User {
     password: String
 }
 
+#[derive(Deserialize)]
+struct Login {
+    username: String,
+    password: String
+}
+
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let ip = "127.0.0.1";
+    let port = 8080;
+    println!("Starting api on {}:{}", ip, port);
     HttpServer::new(|| {
         App::new()
             .service(hello)
             .service(adduser)
+            .service(login)
             .service(testpost)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((ip, port))?
     .run()
     .await
 }
@@ -49,6 +60,12 @@ async fn adduser(params: web::Json<User>) -> impl Responder {
     }
     println!("username: {}\nemail: {}\npassword: {}\n", params.username, params.email, params.password);
     HttpResponse::Ok()
+}
+
+#[post("/login")]
+async fn login(params: web::Json<Login>) -> impl Responder {
+    println!("username: {}, password: {}\n", params.username, params.password);
+    HttpResponse::BadRequest()
 }
 
 //Testmethods - remove
