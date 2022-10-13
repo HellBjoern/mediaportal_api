@@ -49,7 +49,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost';
 Exit mariadb:
 
 ```sql
-quit
+quit;
 ```
 
 Clone and cd into git tree:
