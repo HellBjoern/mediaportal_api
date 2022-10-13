@@ -19,7 +19,7 @@ rustup toolchain install nightly
 Setup mariadb:
 
 ```shell
-mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+sudo mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
 ```
 
 Start mariadb:
