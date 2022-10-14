@@ -1,6 +1,8 @@
 # API Documentation
 
-## Build instructions
+
+
+## Setup instructions
 
 ### Linux
 
@@ -98,7 +100,7 @@ cargo run
 
 - [ ] Coming soon
 
----
+
 
 ## Add
 
@@ -124,7 +126,7 @@ Statuscodes
 | 453  | Could not connect to Pool     |
 | 454  | Error while inserting into DB |
 
----
+
 
 ## Login
 
