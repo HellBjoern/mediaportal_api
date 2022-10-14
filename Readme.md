@@ -1,7 +1,5 @@
 # API Documentation
 
-
-
 ## Setup instructions
 
 ### Linux
@@ -100,23 +98,31 @@ cargo run
 
 - [ ] Coming soon
 
-
-
 ## Add
 
-Path: /user/add
+* Desciption:
+  
+  * Adds a user to the db if possible
 
-Type: Post
+* Path:
+  
+  * /user/add
 
-Takes: Json
+* Type:
+  
+  * Post
 
-Example Data:
+* Takes:
+  
+  * Json
+
+* Example Data:
 
 ```json
 { "username":"username","email":"email@example.com","password":"passwordhash" }
 ```
 
-Statuscodes
+* Statuscodes
 
 | Code | Meaning                       |
 | ---- | ----------------------------- |
@@ -126,17 +132,25 @@ Statuscodes
 | 453  | Could not connect to Pool     |
 | 454  | Error while inserting into DB |
 
-
-
 ## Login
 
-Path: /user/login
+* Description:
+  
+  * Verifies the provided username and password
 
-Type: Post
+* Path:
+  
+  * /user/login
 
-Takes: Json
+* Type:
+  
+  * Post
 
-Example Data:
+* Takes:
+  
+  * Json
+
+* Example Data:
 
 ```json
 { "username":"username","password":"password" }
@@ -153,23 +167,31 @@ Statuscodes
 | 454  | User does not exist          |
 | 455  | Passwords do not match       |
 
-
-
 ## Check
 
-Path: /user/check
+* Description:
+  
+  * Checks if username is present in db
 
-Type: Post
+* Path:
+  
+  * /user/check
 
-Takes: Json
+* Type:
+  
+  * Post
 
-Example Data:
+* Takes:
+  
+  * Json
+
+* Example Data:
 
 ```json
 { "username":"username" }
 ```
 
-Statuscodes
+* Statuscodes
 
 | Code | Meaning                      |
 | ---- | ---------------------------- |
