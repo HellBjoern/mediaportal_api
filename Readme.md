@@ -1,5 +1,7 @@
 # API Documentation
 
+---
+
 ## Setup instructions
 
 ### Linux
@@ -98,6 +100,8 @@ cargo run
 
 - [ ] Coming soon
 
+---
+
 ## Add
 
 * Desciption:
@@ -122,7 +126,7 @@ cargo run
 { "username":"username","email":"email@example.com","password":"passwordhash" }
 ```
 
-* Statuscodes
+* Statuscodes:
 
 | Code | Meaning                       |
 | ---- | ----------------------------- |
@@ -131,6 +135,8 @@ cargo run
 | 452  | Error while creating DB Pool  |
 | 453  | Could not connect to Pool     |
 | 454  | Error while inserting into DB |
+
+---
 
 ## Login
 
@@ -156,7 +162,7 @@ cargo run
 { "username":"username","password":"password" }
 ```
 
-Statuscodes
+Statuscodes:
 
 | Code | Meaning                      |
 | ---- | ---------------------------- |
@@ -166,6 +172,8 @@ Statuscodes
 | 453  | Could not connect to Pool    |
 | 454  | User does not exist          |
 | 455  | Passwords do not match       |
+
+---
 
 ## Check
 
@@ -191,7 +199,7 @@ Statuscodes
 { "username":"username" }
 ```
 
-* Statuscodes
+* Statuscodes:
 
 | Code | Meaning                      |
 | ---- | ---------------------------- |
@@ -200,3 +208,41 @@ Statuscodes
 | 452  | Error while creating DB Pool |
 | 453  | Could not connect to Pool    |
 | 454  | Username does not exist      |
+
+---
+
+## Logged
+
+* Description:
+  
+  * Check if user is logged in
+
+* Path:
+  
+  * /user/logged
+
+* Type:
+  
+  * Post
+
+* Takes;
+  
+  * Json
+
+* Example Data:
+
+```json
+{ "username":"username" }
+```
+
+* Statuscodes:
+
+| Code | Meaning                      |
+| ---- | ---------------------------- |
+| 200  | Logged in                    |
+| 400  | Bad Request / Malformed Json |
+| 452  | Error while creating DB Pool |
+| 453  | Could not connect to Pool    |
+| 454  | Username does not exist      |
+| 455  | Not logged in                |
+| 456  | Error during db request      |
