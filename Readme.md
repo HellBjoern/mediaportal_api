@@ -128,13 +128,13 @@ cargo run
 
 * Statuscodes:
 
-| Code | Meaning                       |
-| ---- | ----------------------------- |
-| 200  | Ok                            |
-| 400  | Bad Request / Malformed Json  |
-| 452  | Error while creating DB Pool  |
-| 453  | Could not connect to Pool     |
-| 454  | Error while inserting into DB |
+| Code | Meaning                       | Working    |
+| ---- | ----------------------------- | ---------- |
+| 200  | User added                    | :question: |
+| 400  | Bad Request / Malformed Json  | :question: |
+| 452  | Error while creating DB Pool  | :question: |
+| 453  | Could not connect to Pool     | :question: |
+| 454  | Error while inserting into DB | :question: |
 
 ---
 
@@ -164,14 +164,14 @@ cargo run
 
 Statuscodes:
 
-| Code | Meaning                      |
-| ---- | ---------------------------- |
-| 200  | Ok                           |
-| 400  | Bad Request / Malformed Json |
-| 452  | Error while creating DB Pool |
-| 453  | Could not connect to Pool    |
-| 454  | User does not exist          |
-| 455  | Passwords do not match       |
+| Code | Meaning                      | Working            |
+| ---- | ---------------------------- | ------------------ |
+| 200  | Successfully logged in       | :heavy_check_mark: |
+| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
+| 452  | Error while creating DB Pool | :heavy_check_mark: |
+| 453  | Could not connect to Pool    | :question:         |
+| 454  | User does not exist          | :heavy_check_mark: |
+| 455  | Passwords do not match       | :heavy_check_mark: |
 
 ---
 
@@ -201,13 +201,13 @@ Statuscodes:
 
 * Statuscodes:
 
-| Code | Meaning                      |
-| ---- | ---------------------------- |
-| 200  | Username exists              |
-| 400  | Bad Request / Malformed Json |
-| 452  | Error while creating DB Pool |
-| 453  | Could not connect to Pool    |
-| 454  | Username does not exist      |
+| Code | Meaning                      | Working            |
+| ---- | ---------------------------- | ------------------ |
+| 200  | Username exists              | :heavy_check_mark: |
+| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
+| 452  | Error while creating DB Pool | :heavy_check_mark: |
+| 453  | Could not connect to Pool    | :question:         |
+| 454  | Username does not exist      | :heavy_check_mark: |
 
 ---
 
@@ -237,12 +237,12 @@ Statuscodes:
 
 * Statuscodes:
 
-| Code | Meaning                      |
-| ---- | ---------------------------- |
-| 200  | Logged in                    |
-| 400  | Bad Request / Malformed Json |
-| 452  | Error while creating DB Pool |
-| 453  | Could not connect to Pool    |
-| 454  | Username does not exist      |
-| 455  | Not logged in                |
-| 456  | Error during db request      |
+| Code | Meaning                      | Working            |
+| ---- | ---------------------------- | ------------------ |
+| 200  | Logged in                    | :heavy_check_mark: |
+| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
+| 452  | Error while creating DB Pool | :heavy_check_mark: |
+| 453  | Could not connect to Pool    | :question:         |
+| 454  | Username does not exist      | :heavy_check_mark: |
+| 455  | Not logged in                | :heavy_check_mark: |
+| 456  | Error during db request      | :question:         |
