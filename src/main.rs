@@ -1,4 +1,5 @@
 use actix_web::{post, web, App, HttpResponse, HttpServer, Responder, http::StatusCode};
+use actix_easy_multipart::{File, FromMultipart, extractor::MultipartForm};
 use mysql::{Pool, prelude::Queryable, params};
 use serde::Deserialize;
 
@@ -35,6 +36,7 @@ async fn main() -> std::io::Result<()> {
             .service(adduser)
             .service(login)
             .service(check)
+            .service(upload)
     })
     .bind((IP, PORT))?
     .run()
@@ -124,4 +126,21 @@ async fn check(username: web::Json<Username>) -> impl Responder {
     } else {
         return HttpResponse::new(StatusCode::from_u16(200).unwrap());
     }
+}
+
+#[derive(FromMultipart)]
+struct FileUpload {
+    description: Option<String>,
+    file: File
+}
+
+#[post("/data/upload")]
+async fn upload(form: MultipartForm<FileUpload>) -> impl Responder {
+    print!("File received is {} bytes ", form.file.size);
+    if form.description.is_some() {
+        println!("with description: {:?}", form.description.as_ref().unwrap());
+    } else {
+        println!("with no description");
+    }
+    return HttpResponse::new(StatusCode::from_u16(690).unwrap());
 }
