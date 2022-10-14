@@ -152,3 +152,29 @@ Statuscodes
 | 453  | Could not connect to Pool    |
 | 454  | User does not exist          |
 | 455  | Passwords do not match       |
+
+
+
+## Check
+
+Path: /user/check
+
+Type: Post
+
+Takes: Json
+
+Example Data:
+
+```json
+{ "username":"username" }
+```
+
+Statuscodes
+
+| Code | Meaning                      |
+| ---- | ---------------------------- |
+| 200  | Username exists              |
+| 400  | Bad Request / Malformed Json |
+| 452  | Error while creating DB Pool |
+| 453  | Could not connect to Pool    |
+| 454  | Username does not exist      |
