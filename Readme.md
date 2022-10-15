@@ -133,8 +133,8 @@ cargo run
 | 200  | User added                   | :heavy_check_mark: |
 | 400  | Bad Request / Malformed Json | :heavy_check_mark: |
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :question:         |
-| 454  | User already exists          | :heavy_check_mark: |
+| 453  | Could not connect to Pool    | :heavy_check_mark: |
+| 454  | Username already exists      | :heavy_check_mark: |
 | 455  | Error during DB operation    | :heavy_check_mark: |
 
 ---
@@ -170,9 +170,9 @@ Statuscodes:
 | 200  | Successfully logged in       | :heavy_check_mark: |
 | 400  | Bad Request / Malformed Json | :heavy_check_mark: |
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :question:         |
-| 454  | User does not exist          | :heavy_check_mark: |
-| 455  | Error during DB operation    | :question:         |
+| 453  | Could not connect to Pool    | :heavy_check_mark: |
+| 454  | Username does not exist      | :heavy_check_mark: |
+| 455  | Error during DB operation    | :heavy_check_mark: |
 | 456  | Passwords do not match       | :heavy_check_mark: |
 
 ---
@@ -208,7 +208,7 @@ Statuscodes:
 | 200  | Successfully logged out      | :heavy_check_mark: |
 | 400  | Bad Request / Malformed Json | :heavy_check_mark: |
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :question:         |
+| 453  | Could not connect to Pool    | :heavy_check_mark: |
 | 454  | Username does not exist      | :heavy_check_mark: |
 | 455  | Error during DB operation    | :heavy_check_mark: |
 
@@ -245,7 +245,7 @@ Statuscodes:
 | 200  | Username exists              | :heavy_check_mark: |
 | 400  | Bad Request / Malformed Json | :heavy_check_mark: |
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :question:         |
+| 453  | Could not connect to Pool    | :heavy_check_mark: |
 | 454  | Username does not exist      | :heavy_check_mark: |
 
 ---
@@ -281,7 +281,7 @@ Statuscodes:
 | 200  | Logged in                    | :heavy_check_mark: |
 | 400  | Bad Request / Malformed Json | :heavy_check_mark: |
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :question:         |
+| 453  | Could not connect to Pool    | :heavy_check_mark: |
 | 454  | Username does not exist      | :heavy_check_mark: |
-| 455  | Error during DB operation    | :question:         |
+| 455  | Error during DB operation    | :heav:             |
 | 456  | Not logged in                | :heavy_check_mark: |
