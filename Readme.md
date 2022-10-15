@@ -128,13 +128,14 @@ cargo run
 
 * Statuscodes:
 
-| Code | Meaning                       | Working    |
-| ---- | ----------------------------- | ---------- |
-| 200  | User added                    | :question: |
-| 400  | Bad Request / Malformed Json  | :question: |
-| 452  | Error while creating DB Pool  | :question: |
-| 453  | Could not connect to Pool     | :question: |
-| 454  | Error while inserting into DB | :question: |
+| Code | Meaning                      | Working            |
+| ---- | ---------------------------- | ------------------ |
+| 200  | User added                   | :heavy_check_mark: |
+| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
+| 452  | Error while creating DB Pool | :heavy_check_mark: |
+| 453  | Could not connect to Pool    | :question:         |
+| 454  | User already exists          | :heavy_check_mark: |
+| 455  | Error during DB operation    | :heavy_check_mark: |
 
 ---
 
@@ -171,7 +172,45 @@ Statuscodes:
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
 | 453  | Could not connect to Pool    | :question:         |
 | 454  | User does not exist          | :heavy_check_mark: |
-| 455  | Passwords do not match       | :heavy_check_mark: |
+| 455  | Error during DB operation    | :question:         |
+| 456  | Passwords do not match       | :heavy_check_mark: |
+
+---
+
+## Logout
+
+* Description:
+  
+  * Logs out user if present
+
+* Path:
+  
+  * /user/logout
+
+* Type:
+  
+  * Post
+
+* Takes:
+  
+  * Json
+
+* Example Data:
+
+```json
+{ "username":"username" }
+```
+
+* Statuscodes:
+
+| Code | Meaning                      | Working            |
+| ---- | ---------------------------- | ------------------ |
+| 200  | Successfully logged out      | :heavy_check_mark: |
+| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
+| 452  | Error while creating DB Pool | :heavy_check_mark: |
+| 453  | Could not connect to Pool    | :question:         |
+| 454  | Username does not exist      | :heavy_check_mark: |
+| 455  | Error during DB operation    | :heavy_check_mark: |
 
 ---
 
@@ -244,5 +283,5 @@ Statuscodes:
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
 | 453  | Could not connect to Pool    | :question:         |
 | 454  | Username does not exist      | :heavy_check_mark: |
-| 455  | Not logged in                | :heavy_check_mark: |
-| 456  | Error during db request      | :question:         |
+| 455  | Error during DB operation    | :question:         |
+| 456  | Not logged in                | :heavy_check_mark: |

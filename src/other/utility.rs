@@ -1,10 +1,11 @@
 use mysql::{Pool, prelude::Queryable, params};
 
-use crate::other::structs::Login;
-
 /*
 * Utility functions
 */
+//returns
+//success: true/false
+//fail: 452, 453
 pub fn checkname(username: String) -> Result<bool, u16>{
     let pool = match  Pool::new(crate::SQL) {
         Ok(pret) => pret,
@@ -22,7 +23,7 @@ pub fn checkname(username: String) -> Result<bool, u16>{
         },
     };
 
-    let res= match conn.exec_first("SELECT uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &username}).map(|row| { row.map(|(uusername, upassword)| Login { username: uusername, password: upassword }) }) {
+    let res= match conn.exec_first("SELECT uusername FROM users WHERE uusername =:uname", params! { "uname" => &username}).map(|row: Option<String>| { row }) {
         Ok(ret) => ret,
         Err(_) => None,
     };
@@ -33,6 +34,9 @@ pub fn checkname(username: String) -> Result<bool, u16>{
     }
 }
 
+//returns
+//success: true / false
+//fail: 452, 453, 454, 455
 pub fn logged(username: String) -> Result<bool, u16>{
     match checkname(username.clone()) {
         Ok(res) => {
@@ -64,6 +68,6 @@ pub fn logged(username: String) -> Result<bool, u16>{
 
     match conn.exec_first("SELECT ulogged FROM users WHERE uusername =:uname", params! { "uname" => username }).map(|row: Option<bool>| { row.unwrap() }) {
         Ok(ret) => return Ok(ret),
-        Err(_) => return Err(456),
+        Err(_) => return Err(455),
     };
 }

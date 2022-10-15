@@ -24,6 +24,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .service(user::adduser)
             .service(user::login)
+            .service(user::logout)
             .service(user::check)
             .service(user::loggeds)
             .service(data::upload)
