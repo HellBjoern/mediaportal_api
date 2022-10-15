@@ -283,5 +283,5 @@ Statuscodes:
 | 452  | Error while creating DB Pool | :heavy_check_mark: |
 | 453  | Could not connect to Pool    | :heavy_check_mark: |
 | 454  | Username does not exist      | :heavy_check_mark: |
-| 455  | Error during DB operation    | :heav:             |
+| 455  | Error during DB operation    | :heavy:            |
 | 456  | Not logged in                | :heavy_check_mark: |
