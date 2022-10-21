@@ -6,13 +6,15 @@ On Success Code is 200
 
 On Error / Failure / Other Code is 400
 
-## 
+ 
 
 ## Login
 
 * Checks credentials and on success returns user + 
 
 * *ip*:*port*/user/login
+
+---
 
 **Request**
 
@@ -24,6 +26,8 @@ Example Data:
     "password":"password"
 }
 ```
+
+---
 
 **Response**
 
@@ -68,6 +72,8 @@ Json deserialize error: ...
 
 * *ip*:*port*/user/logout
 
+---
+
 **Request**
 
 Example Data:
@@ -77,6 +83,8 @@ Example Data:
     "username"
 }
 ```
+
+---
 
 **Response**
 
@@ -112,13 +120,13 @@ Json deserialize error: ...
 }
 ```
 
-
-
 ## Logged
 
 - Checks if user is logged in
 
 - *ip*:*port*/user/logged
+
+---
 
 **Request**
 
@@ -129,6 +137,8 @@ Example Data:
     "username"
 }
 ```
+
+---
 
 **Response**
 
@@ -164,13 +174,13 @@ Json deserialize error: ...
 }
 ```
 
-
-
 ## Add
 
 - Inserts user into Database
 
 - *ip*:*port*/user/add
+
+---
 
 **Request**
 
@@ -183,6 +193,8 @@ Example Data:
     "password":"sha256"
 }
 ```
+
+---
 
 **Response**
 
@@ -219,13 +231,13 @@ Json deserialize error: ...
 }
 ```
 
-
-
 ## Check
 
 - Checks if user exists in DB (ONLY FOR TESTING)(SECURITY RISK)
 
 - *ip*:*port*/user/check
+
+---
 
 **Request**
 
@@ -236,6 +248,8 @@ Example Data:
     "username":"username"
 }
 ```
+
+---
 
 **Response**
 
