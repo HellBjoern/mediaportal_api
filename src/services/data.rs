@@ -1,5 +1,6 @@
 use actix_easy_multipart::{extractor::MultipartForm};
-use actix_web::{post, Responder, http::StatusCode, HttpResponse};
+use actix_web::{post, Responder};
+use serde_json::json;
 use crate::other::structs::FileUpload;
 
 /*
@@ -13,5 +14,7 @@ async fn upload(form: MultipartForm<FileUpload>) -> impl Responder {
     } else {
         println!("Has no description");
     }
-    return HttpResponse::new(StatusCode::from_u16(690).unwrap());
+
+    //return HttpResponse::new(StatusCode::from_u16(690).unwrap()).json();
+    return actix_web::HttpResponse::BadRequest().json(json!({ "code":"69", "message":"olls hin"}));
 }

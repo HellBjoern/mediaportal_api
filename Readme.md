@@ -1,287 +1,264 @@
-# API Documentation
+# Api Documentation
 
----
+## General
 
-## Setup instructions
+On Success Code is 200
 
-### Linux
+On Error / Failure / Other Code is 400
 
-Install rustup and mariadb e.g:
-
-```shell
-yay -S rustup mariadb
-```
-
-Setup the rustup toolchain:
-
-```shell
-rustup toolchain install nightly
-```
-
-Clone and cd into git tree:
-
-```
-git clone https://github.com/HellBjoern/mediaportal_api && cd mediaportal_api
-```
-
-Setup mariadb:
-
-```shell
-sudo mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-```
-
-Start mariadb:
-
-```shell
-systemctl start mariadb
-```
-
-Connect to mariadb:
-
-```shell
-sudo mysql -u root -p
-```
-
-Add SQL user:
-
-```sql
-CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
-```
-
-Grant privileges to user:
-
-```sql
-GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost';
-```
-
-Create database:
-
-```sql
-CREATE DATABASE db_name;
-```
-
-Use new Database:
-
-```sql
-USE db_name;
-```
-
-Import tables:
-
-```sql
-SOURCE mediaportal.sql;
-```
-
-Exit mariadb:
-
-```sql
-QUIT;
-```
-
-Edit src/main.rs static SQL to match your username and password for SQL:
-
-```shell
-vim src/main.rs
-```
-
-Build:
-
-```shell
-cargo build
-```
-
-Run:
-
-```shell
-cargo run
-```
-
-### Windows
-
-- [ ] Coming soon
-
----
-
-## Add
-
-* Desciption:
-  
-  * Adds a user to the db if possible
-
-* Path:
-  
-  * /user/add
-
-* Type:
-  
-  * Post
-
-* Takes:
-  
-  * Json
-
-* Example Data:
-
-```json
-{ "username":"username","email":"email@example.com","password":"passwordhash" }
-```
-
-* Statuscodes:
-
-| Code | Meaning                      | Working            |
-| ---- | ---------------------------- | ------------------ |
-| 200  | User added                   | :heavy_check_mark: |
-| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
-| 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :heavy_check_mark: |
-| 454  | Username already exists      | :heavy_check_mark: |
-| 455  | Error during DB operation    | :heavy_check_mark: |
-
----
+## 
 
 ## Login
 
-* Description:
-  
-  * Verifies the provided username and password
+* Checks credentials and on success returns user + 
 
-* Path:
-  
-  * /user/login
+* *ip*:*port*/user/login
 
-* Type:
-  
-  * Post
+**Request**
 
-* Takes:
-  
-  * Json
-
-* Example Data:
+Example Data:
 
 ```json
-{ "username":"username","password":"password" }
+{
+    "username":"username",
+    "password":"password"
+}
 ```
 
-Statuscodes:
+**Response**
 
-| Code | Meaning                      | Working            |
-| ---- | ---------------------------- | ------------------ |
-| 200  | Successfully logged in       | :heavy_check_mark: |
-| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
-| 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :heavy_check_mark: |
-| 454  | Username does not exist      | :heavy_check_mark: |
-| 455  | Error during DB operation    | :heavy_check_mark: |
-| 456  | Passwords do not match       | :heavy_check_mark: |
+Success:
 
----
+```json
+{
+    "id": 1,
+    "username": "username"
+}
+```
+
+Failure:
+
+* Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+* Wrong Username / Password
+
+```json
+{
+    "message": "Wrong Credentials!"
+}
+```
+
+* Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+## 
 
 ## Logout
 
-* Description:
-  
-  * Logs out user if present
+* Logs user out
 
-* Path:
-  
-  * /user/logout
+* *ip*:*port*/user/logout
 
-* Type:
-  
-  * Post
+**Request**
 
-* Takes:
-  
-  * Json
-
-* Example Data:
+Example Data:
 
 ```json
-{ "username":"username" }
+{
+    "username"
+}
 ```
 
-* Statuscodes:
+**Response**
 
-| Code | Meaning                      | Working            |
-| ---- | ---------------------------- | ------------------ |
-| 200  | Successfully logged out      | :heavy_check_mark: |
-| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
-| 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :heavy_check_mark: |
-| 454  | Username does not exist      | :heavy_check_mark: |
-| 455  | Error during DB operation    | :heavy_check_mark: |
-
----
-
-## Check
-
-* Description:
-  
-  * Checks if username is present in db
-
-* Path:
-  
-  * /user/check
-
-* Type:
-  
-  * Post
-
-* Takes:
-  
-  * Json
-
-* Example Data:
+Success:
 
 ```json
-{ "username":"username" }
+{
+    "message": "Successfully logged out!"
+}
 ```
 
-* Statuscodes:
+Failure:
 
-| Code | Meaning                      | Working            |
-| ---- | ---------------------------- | ------------------ |
-| 200  | Username exists              | :heavy_check_mark: |
-| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
-| 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :heavy_check_mark: |
-| 454  | Username does not exist      | :heavy_check_mark: |
+- Sent invalid Json
 
----
+```json
+Json deserialize error: ...
+```
+
+* Wrong Username
+
+```json
+{
+    "message": "User does not exist!"
+}
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+
 
 ## Logged
 
-* Description:
-  
-  * Check if user is logged in
+- Checks if user is logged in
 
-* Path:
-  
-  * /user/logged
+- *ip*:*port*/user/logged
 
-* Type:
-  
-  * Post
+**Request**
 
-* Takes;
-  
-  * Json
-
-* Example Data:
+Example Data:
 
 ```json
-{ "username":"username" }
+{
+    "username"
+}
 ```
 
-* Statuscodes:
+**Response**
 
-| Code | Meaning                      | Working            |
-| ---- | ---------------------------- | ------------------ |
-| 200  | Logged in                    | :heavy_check_mark: |
-| 400  | Bad Request / Malformed Json | :heavy_check_mark: |
-| 452  | Error while creating DB Pool | :heavy_check_mark: |
-| 453  | Could not connect to Pool    | :heavy_check_mark: |
-| 454  | Username does not exist      | :heavy_check_mark: |
-| 455  | Error during DB operation    | :heavy_check_mark: |
-| 456  | Not logged in                | :heavy_check_mark: |
+Success:
+
+```json
+{
+    "logged": true/false
+}
+```
+
+Failure:
+
+- Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+- Wrong Username
+
+```json
+{
+    "message": "User does not exist!"
+}
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+
+
+## Add
+
+- Inserts user into Database
+
+- *ip*:*port*/user/add
+
+**Request**
+
+Example Data:
+
+```json
+{
+    "username":"username",
+    "email":"email@example.com",
+    "password":"sha256"
+}
+```
+
+**Response**
+
+Success:
+
+```json
+{
+    "id": uid
+    "username": "username"
+}
+```
+
+Failure:
+
+- Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+- Username taken
+
+```json
+{
+    "message": "User already exists!"
+}
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+
+
+## Check
+
+- Checks if user exists in DB (ONLY FOR TESTING)(SECURITY RISK)
+
+- *ip*:*port*/user/check
+
+**Request**
+
+Example Data:
+
+```json
+{
+    "username":"username"
+}
+```
+
+**Response**
+
+Success:
+
+```json
+{
+    "message": true/false
+}
+```
+
+Failure:
+
+- Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```

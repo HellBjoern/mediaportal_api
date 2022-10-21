@@ -17,8 +17,9 @@ pub struct User {
     pub password: String
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Login {
+    pub id: Option<i32>,
     pub username: String,
     pub password: String
 }

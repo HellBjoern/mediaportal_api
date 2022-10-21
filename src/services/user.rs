@@ -1,145 +1,113 @@
-use actix_web::{post, web, Responder, HttpResponse, http::StatusCode};
-use mysql::{Pool, prelude::Queryable, params};
-use crate::other::{structs::{User, Login, Username}, utility::{checkname, logged}};
+use actix_web::{post, Responder, web, HttpResponse};
+use mysql::{prelude::Queryable, params};
+use serde_json::json;
+use crate::other::{utility::{checkname_fn, get_conn_fn, logged_fn}, structs::{Login, Username, User}};
 
-/*
-* User services
-*/
-//add user
-#[post("/user/add")]
-async fn adduser(params: web::Json<User>) -> impl Responder {
-    match checkname(params.username.clone()) {
-        Ok(res) => {
-            if res {
-                return HttpResponse::new(StatusCode::from_u16(454).unwrap());
-            }
-        },
-        Err(code) => return HttpResponse::new(StatusCode::from_u16(code).unwrap())
-    };
-
-    let pool = match  Pool::new(crate::SQL) {
-        Ok(pret) => pret,
-        Err(err) => {
-            println!("Could not create Pool; Error:\n{:?}", err);
-            return HttpResponse::new(StatusCode::from_u16(452).unwrap());
-        },
-    };
-
-    let mut conn = match pool.get_conn() {
-        Ok(pooled_con) => pooled_con,
-        Err(err) => {
-            println!("Connection failed; Error:\n{:?}", err);
-            return HttpResponse::new(StatusCode::from_u16(453).unwrap());
-        },
-    };
-
-    match conn.exec_drop("INSERT INTO users(uusername, uemail, upassword) VALUES (?, ?, ?)", (&params.username, &params.email, &params.password)) {
-        Ok(_) => return HttpResponse::new(StatusCode::from_u16(200).unwrap()),
-        Err(_) => return HttpResponse::new(StatusCode::from_u16(455).unwrap()),
-    };
-}
-//login user + set ulogged to 1
+//login service; takes json; responds with either code 400 on error + json msg or on success 200 + json msg
 #[post("/user/login")]
 async fn login(valuser: web::Json<Login>) -> impl Responder {
-    match checkname(valuser.username.clone()) {
+    match checkname_fn(valuser.username.clone()) {
         Ok(res) => {
             if !res {
-                return HttpResponse::new(StatusCode::from_u16(454).unwrap());
+                return HttpResponse::BadRequest().json(json!({ "message":"Wrong Credentials!" }));
             }
         },
-        Err(code) => return HttpResponse::new(StatusCode::from_u16(code).unwrap())
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err })),
     };
 
-    let pool = match  Pool::new(crate::SQL) {
-        Ok(pret) => pret,
-        Err(err) => {
-            println!("Could not create Pool; Error:\n{:?}", err);
-            return HttpResponse::new(StatusCode::from_u16(452).unwrap())
-        },
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err })),
     };
 
-    let mut conn = match pool.get_conn() {
-        Ok(pooled_con) => pooled_con,
-        Err(err) => {
-            println!("Connection failed; Error:\n{:?}", err);
-            return HttpResponse::new(StatusCode::from_u16(453).unwrap());
-        },
-    };
-
-    match conn.exec_first("SELECT uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &valuser.username}).map(|row| { row.map(|(uusername, upassword)| Login { username: uusername, password: upassword }) }) {
+    match conn.exec_first("SELECT uid, uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &valuser.username}).map(|row| { row.map(|(uid, uusername, upassword)| Login { id: uid, username: uusername, password: upassword }) }) {
         Ok(res) => {
-            if res.unwrap().password == valuser.password {
+            if !res.is_none() && res.as_ref().unwrap().password == valuser.password {
                 match conn.exec_drop("UPDATE users SET ulogged = 1 WHERE uusername=:uname", params! { "uname" => &valuser.username}) {
-                    Ok(_) => {},
-                    Err(_) => { println!("test"); return HttpResponse::new(StatusCode::from_u16(455).unwrap())},
+                    Ok(_) => return HttpResponse::Ok().json(json!({ "id":&res.as_ref().unwrap().id, "username":res.as_ref().unwrap().username })),
+                    Err(err) => return HttpResponse::BadRequest().json(json!({"message":err.to_string()})),
                 };
-                return HttpResponse::new(StatusCode::from_u16(200).unwrap());
             } else {
-                return HttpResponse::new(StatusCode::from_u16(456).unwrap());
+                return HttpResponse::BadRequest().json(json!({ "message":"Wrong Credentials!" }));
             }
         },
-        Err(_) => return HttpResponse::new(StatusCode::from_u16(455).unwrap()),
-    };
-    
-}
-//does username exist in db
-#[post("/user/check")]
-async fn check(username: web::Json<Username>) -> impl Responder {
-    match checkname(username.username.to_string()) {
-        Ok(res) => {
-            if res {
-                return HttpResponse::new(StatusCode::from_u16(200).unwrap());
-            } else {
-                return HttpResponse::new(StatusCode::from_u16(454).unwrap());
-            }
-        },
-        Err(code) => return HttpResponse::new(StatusCode::from_u16(code).unwrap())
+        Err(_) => return HttpResponse::BadRequest().json(json!({ "message":"Database Error" })),
     };
 }
-//is user ulogged set
-#[post("/user/logged")]
-async fn loggeds(username: web::Json<Username>) -> impl Responder {
-    match logged(username.username.clone()) {
-        Ok(res) => {
-            if res {
-                return HttpResponse::new(StatusCode::from_u16(200).unwrap());
-            } else {
-                return HttpResponse::new(StatusCode::from_u16(456).unwrap());
-            }
-        },
-        Err(res) => return HttpResponse::new(StatusCode::from_u16(res).unwrap()),
-    };
-}
-//set ulogged for user to 0
+
+//logout user of database
 #[post("/user/logout")]
 async fn logout(username: web::Json<Username>) -> impl Responder {
-    match checkname(username.username.clone()) {
+    match checkname_fn(username.username.clone()) {
         Ok(res) => {
             if !res {
-                return HttpResponse::new(StatusCode::from_u16(454).unwrap());
+                return HttpResponse::BadRequest().json(json!({ "message":"User does not exist!" }));
             }
         },
-        Err(code) => return HttpResponse::new(StatusCode::from_u16(code).unwrap())
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err })),
     };
 
-    let pool = match  Pool::new(crate::SQL) {
-        Ok(pret) => pret,
-        Err(err) => {
-            println!("Could not create Pool; Error:\n{:?}", err);
-            return HttpResponse::new(StatusCode::from_u16(452).unwrap())
-        },
-    };
-
-    let mut conn = match pool.get_conn() {
-        Ok(pooled_con) => pooled_con,
-        Err(err) => {
-            println!("Connection failed; Error:\n{:?}", err);
-            return HttpResponse::new(StatusCode::from_u16(453).unwrap());
-        },
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err })),
     };
 
     match conn.exec_drop("UPDATE users SET ulogged = 0 WHERE uusername=:uname", params! { "uname" => &username.username}) {
-        Ok(_) => return HttpResponse::new(StatusCode::from_u16(200).unwrap()),
-        Err(_) => return HttpResponse::new(StatusCode::from_u16(455).unwrap()),
+        Ok(_) => return HttpResponse::Ok().json(json!({ "message":"Successfully logged out!" })),
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err.to_string() })),
+    };
+}
+
+//checks if user is logged in database; returns 200 + json msg on success or 400 + json msg on failure 
+#[post("/user/logged")]
+async fn logged(username: web::Json<Username>) -> impl Responder {
+    match logged_fn(username.username.clone()) {
+        Ok(res) => return HttpResponse::Ok().json(json!({ "logged":res })),
+        Err(res) => return HttpResponse::BadRequest().json(json!({ "message":res })),
+    };
+}
+
+//inserts user into DB; 
+#[post("/user/add")]
+async fn adduser(user: web::Json<User>) -> impl Responder {
+    match checkname_fn(user.username.clone()) {
+        Ok(res) => {
+            if res {
+                return HttpResponse::BadRequest().json(json!({ "message":"User already exists!" }));
+            }
+        },
+        Err(code) => return HttpResponse::BadRequest().json(json!({ "message":code })),
+    };
+
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err })),
+    };
+
+    match conn.exec_drop("INSERT INTO users(uusername, uemail, upassword) VALUES (?, ?, ?)", (&user.username, &user.email, &user.password)) {
+        Ok(_) => {
+            match conn.exec_first("SELECT uid, uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &user.username}).map(|row| { row.map(|(uid, uusername, upassword)| Login { id: uid, username: uusername, password: upassword }) }) {
+                Ok(res) => {
+                    if !res.is_none() {
+                        return HttpResponse::Ok().json(json!({ "id":&res.as_ref().unwrap().id, "username":res.as_ref().unwrap().username }));
+                    } else {
+                        return HttpResponse::BadRequest().json(json!({ "message":"User does not exist? Database magic broke" }));
+                    }
+                },
+                Err(_) => return HttpResponse::BadRequest().json(json!({ "message":"Database Error" })),
+            };
+        },
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err.to_string() })),
+    };
+}
+
+//checks if username exists in DB
+#[post("/user/check")]
+async fn check(username: web::Json<Username>) -> impl Responder {
+    match checkname_fn(username.username.to_string()) {
+        Ok(res) => {
+            return HttpResponse::Ok().json(json!({ "message":res }));
+        },
+        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":err.to_string() })),
     };
 }

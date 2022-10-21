@@ -34,7 +34,7 @@ async fn main() -> std::io::Result<()> {
             .service(user::login)
             .service(user::logout)
             .service(user::check)
-            .service(user::loggeds)
+            .service(user::logged)
             .service(data::upload)
     })
     .bind((IP, PORT))?
