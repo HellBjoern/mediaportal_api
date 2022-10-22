@@ -8,9 +8,6 @@ extern crate pretty_env_logger;
 mod services;
 mod other;
 
-/*
-* Constants
-*/
 //config location
 const CONFPATH: &str = "api.toml";
 //config struct
