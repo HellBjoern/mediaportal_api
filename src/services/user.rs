@@ -7,7 +7,7 @@ use crate::other::{utility::{checkname_fn, get_conn_fn, logged_fn}, structs::{Lo
 //login service; takes json; responds with either code 400 on error + json msg or on success 200 + json msg
 #[post("/user/login")]
 async fn login(valuser: web::Json<Login>) -> impl Responder {
-    info!("received login service request");
+    info!("[REQ] /user/login");
     match checkname_fn(valuser.username.clone()) {
         Ok(res) => {
             if !res {
@@ -54,7 +54,7 @@ async fn login(valuser: web::Json<Login>) -> impl Responder {
 //logout user of database
 #[post("/user/logout")]
 async fn logout(username: web::Json<Username>) -> impl Responder {
-    info!("received logout service request");
+    info!("[REQ] /user/logout");
     match checkname_fn(username.username.clone()) {
         Ok(res) => {
             if !res {
@@ -91,7 +91,7 @@ async fn logout(username: web::Json<Username>) -> impl Responder {
 //checks if user is logged in database; returns 200 + json msg on success or 400 + json msg on failure 
 #[post("/user/logged")]
 async fn logged(username: web::Json<Username>) -> impl Responder {
-    info!("received logged service request");
+    info!("[REQ] /user/logged");
     match logged_fn(username.username.clone()) {
         Ok(res) => {
             info!("successfully answered logged request");
@@ -107,7 +107,7 @@ async fn logged(username: web::Json<Username>) -> impl Responder {
 //inserts user into DB; 
 #[post("/user/add")]
 async fn add(user: web::Json<User>) -> impl Responder {
-    info!("received add service request");
+    info!("[REQ] /user/add");
     match checkname_fn(user.username.clone()) {
         Ok(res) => {
             if res {
@@ -157,7 +157,7 @@ async fn add(user: web::Json<User>) -> impl Responder {
 //checks if username exists in DB
 #[post("/user/check")]
 async fn check(username: web::Json<Username>) -> impl Responder {
-    info!("received check service request");
+    info!("[REQ] /user/check");
     match checkname_fn(username.username.to_string()) {
         Ok(res) => {
             info!("successfully answered check request");
