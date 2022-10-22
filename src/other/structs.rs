@@ -35,3 +35,14 @@ pub struct Chpwd {
     pub oldpwd: String,
     pub newpwd: String
 }
+
+#[derive(Deserialize)]
+pub struct Config {
+    pub ip: String,
+    pub port: u16,
+    pub sqladd: String,
+    pub sqlusr: String,
+    pub sqlpwd: String,
+    pub sqlprt: u16,
+    pub sqldab: String
+}

@@ -1,0 +1,12 @@
+#ip and port for http server
+ip = "0.0.0.0"
+port = 8080
+
+#address of sql server
+sqladd = "127.0.0.1"
+sqlprt = 3306
+#user and password on sql server
+sqlusr = "user"
+sqlpwd = "password"
+#database to use on sql server
+sqldab = "mediaportal"

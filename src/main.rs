@@ -1,7 +1,8 @@
 use actix_cors::Cors;
 use actix_web::{App, HttpServer, http::header};
 use log::info;
-use crate::services::{user, data};
+use lazy_static::lazy_static;
+use crate::{services::{user, data}, other::{structs::Config, utility::get_conf}};
 extern crate pretty_env_logger;
 
 mod services;
@@ -10,12 +11,16 @@ mod other;
 /*
 * Constants
 */
-//Hosting on Localhost
-const IP: &str = "0.0.0.0";
-//API Port
-const PORT: u16 = 8080;
-//Database connection
-const SQL: &str = "mysql://user:password@127.0.0.1:3306/mediaportal";
+//config location
+const CONFPATH: &str = "api.toml";
+//config struct
+lazy_static! {
+    pub static ref CONFIG: Config = get_conf();
+}
+//sql connection string
+lazy_static! {
+    pub static ref SQL: String = format!("mysql://{}:{}@{}:{}/{}", CONFIG.sqlusr, CONFIG.sqlpwd, CONFIG.sqladd, CONFIG.sqlprt, CONFIG.sqldab);
+}
 
 /*
 * Main Function
@@ -23,7 +28,7 @@ const SQL: &str = "mysql://user:password@127.0.0.1:3306/mediaportal";
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     pretty_env_logger::init();
-    info!("Starting api on {}:{}", IP, PORT);
+    info!("Starting api on {}:{}", CONFIG.ip, CONFIG.port);
     HttpServer::new(|| {
         let cors = Cors::default()
             .allow_any_origin()
@@ -41,7 +46,7 @@ async fn main() -> std::io::Result<()> {
             .service(user::logged)
             .service(data::upload)
     })
-    .bind((IP, PORT))?
+    .bind((CONFIG.ip.clone(), CONFIG.port))?
     .run()
     .await
 }

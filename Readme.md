@@ -78,10 +78,10 @@ Exit mariadb:
 QUIT;
 ```
 
-Edit src/main.rs static SQL to match your username and password for SQL:
+Edit api.toml config file to match needs:
 
 ```shell
-vim src/main.rs
+vim api.toml
 ```
 
 Build:
