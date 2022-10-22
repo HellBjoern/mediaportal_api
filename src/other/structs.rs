@@ -28,3 +28,10 @@ pub struct Login {
 pub struct Username {
     pub username: String
 }
+
+#[derive(Deserialize)]
+pub struct Chpwd {
+    pub username: String,
+    pub oldpwd: String,
+    pub newpwd: String
+}

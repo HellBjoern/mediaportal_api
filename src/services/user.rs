@@ -2,7 +2,7 @@ use actix_web::{post, Responder, web, HttpResponse};
 use log::{warn, info, error};
 use mysql::{prelude::Queryable, params};
 use serde_json::json;
-use crate::other::{utility::{checkname_fn, get_conn_fn, logged_fn}, structs::{Login, Username, User}};
+use crate::other::{utility::{checkname_fn, get_conn_fn, logged_fn}, structs::{Login, Username, User, Chpwd}};
 
 //login service; takes json; responds with either code 400 on error + json msg or on success 200 + json msg
 #[post("/user/login")]
@@ -37,7 +37,10 @@ async fn login(valuser: web::Json<Login>) -> impl Responder {
                         info!("successfully logged user in");
                         return HttpResponse::Ok().json(json!({ "id":&res.as_ref().unwrap().id, "username":res.as_ref().unwrap().username }))
                     },
-                    Err(err) => return HttpResponse::BadRequest().json(json!({"message":err.to_string()})),
+                    Err(err) => {
+                        error!("database threw error: {err}");
+                        return HttpResponse::BadRequest().json(json!({"message":err.to_string()}))
+                    },
                 };
             } else {
                 warn!("attempted login with invalid credentials");
@@ -154,7 +157,58 @@ async fn add(user: web::Json<User>) -> impl Responder {
     };
 }
 
-//checks if username exists in DB
+//attempts to change password for user;
+#[post("/user/chpwd")]
+async fn chpwd(chpwd: web::Json<Chpwd>) -> impl Responder {
+    info!("[REQ] /user/chpwd");
+    match checkname_fn(chpwd.username.clone()) {
+        Ok(res) => {
+            if !res {
+                warn!("attempted to change password for invalid user");
+                return HttpResponse::BadRequest().json(json!({ "message":"User does not exist!" }));
+            }
+        },
+        Err(err) => {
+            error!("checkname_fn failed with error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }))
+        },
+    };
+
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => {
+            error!("get_conn_fn failed with error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }))
+        },
+    };
+
+    match conn.exec_first("SELECT uid, uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &chpwd.username}).map(|row| { row.map(|(uid, uusername, upassword)| Login { id: uid, username: uusername, password: upassword }) }) {
+        Ok(res) => {
+            if !res.is_none() && res.as_ref().unwrap().password == chpwd.oldpwd {
+                match conn.exec_drop("UPDATE users SET upassword =:npwd WHERE uusername=:uname", params! { "npwd" => &chpwd.newpwd,  "uname" => &chpwd.username}) {
+                    Ok(_) => {
+                        info!("successfully changed password");
+                        return HttpResponse::Ok().json(json!({ "message":"Changed password successfully!" }))
+                    },
+                    Err(err) => {
+                        error!("database threw error: {err}");
+                        return HttpResponse::BadRequest().json(json!({"message":err.to_string()}))
+                    },
+                };
+            } else {
+                warn!("attempted chpwd with invalid credentials");
+                return HttpResponse::BadRequest().json(json!({ "message":"Wrong Credentials!" }));
+            }
+        },
+        Err(err) => {
+            error!("database threw error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }))
+        },
+    };
+
+}
+
+//checks if username exists in DB; (REMOVE FOR PRODUCTION)
 #[post("/user/check")]
 async fn check(username: web::Json<Username>) -> impl Responder {
     info!("[REQ] /user/check");

@@ -114,11 +114,9 @@ On Success Code is 200
 
 On Error / Failure / Other Code is 400
 
-Logging can be turned on by 
-
 ## Login
 
-* Checks credentials and on success returns user + 
+* Checks credentials and on success returns user + uid
 
 * *ip*:*port*/user/login
 
@@ -130,8 +128,8 @@ Example Data:
 
 ```json
 {
-    "username":"username",
-    "password":"password"
+    "username": "username",
+    "password": "password"
 }
 ```
 
@@ -172,8 +170,6 @@ Json deserialize error: ...
 }
 ```
 
-
-
 ## Logout
 
 * Logs user out
@@ -188,7 +184,7 @@ Example Data:
 
 ```json
 {
-    "username"
+    "username": "username"
 }
 ```
 
@@ -242,7 +238,7 @@ Example Data:
 
 ```json
 {
-    "username"
+    "username": "username"
 }
 ```
 
@@ -282,6 +278,70 @@ Json deserialize error: ...
 }
 ```
 
+## Chpwd
+
+* Changes the password for a user
+
+* *ip*:*port*/user/chpwd
+
+---
+
+**Request**
+
+Example Data:
+
+```json
+{
+    "username": "username",
+    "oldpwd": "old_password",
+    "newpwd": "new_password"
+}
+```
+
+---
+
+**Response**
+
+Success:
+
+```json
+{
+    "message": "Changed password successfully!"
+}
+```
+
+Failure:
+
+- Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+- Username does not exist
+
+```json
+{
+    "message": "User does not exist!"
+}
+```
+
+* Wrong old password
+
+```json
+{
+    "message": "Wrong Credentials!"
+}
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
 ## Add
 
 - Inserts user into Database
@@ -296,9 +356,9 @@ Example Data:
 
 ```json
 {
-    "username":"username",
-    "email":"email@example.com",
-    "password":"sha256"
+    "username": "username",
+    "email": "email@example.com",
+    "password": "sha256"
 }
 ```
 
@@ -310,7 +370,7 @@ Success:
 
 ```json
 {
-    "id": uid
+    "id": uid,
     "username": "username"
 }
 ```
@@ -353,7 +413,7 @@ Example Data:
 
 ```json
 {
-    "username":"username"
+    "username": "username"
 }
 ```
 

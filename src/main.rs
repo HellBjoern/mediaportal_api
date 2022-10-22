@@ -36,6 +36,7 @@ async fn main() -> std::io::Result<()> {
             .service(user::add)
             .service(user::login)
             .service(user::logout)
+            .service(user::chpwd)
             .service(user::check)
             .service(user::logged)
             .service(data::upload)
