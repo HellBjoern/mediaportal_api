@@ -1,6 +1,8 @@
 use actix_cors::Cors;
 use actix_web::{App, HttpServer, http::header};
+use log::info;
 use crate::services::{user, data};
+extern crate pretty_env_logger;
 
 mod services;
 mod other;
@@ -20,7 +22,8 @@ const SQL: &str = "mysql://user:password@127.0.0.1:3306/mediaportal";
 */
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Starting api on {}:{}", IP, PORT);
+    pretty_env_logger::init();
+    info!("Starting api on {}:{}", IP, PORT);
     HttpServer::new(|| {
         let cors = Cors::default()
             .allow_any_origin()
@@ -30,7 +33,7 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600);
         App::new()
             .wrap(cors)
-            .service(user::adduser)
+            .service(user::add)
             .service(user::login)
             .service(user::logout)
             .service(user::check)
