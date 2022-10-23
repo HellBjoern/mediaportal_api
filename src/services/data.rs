@@ -46,7 +46,6 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
             info!("successfully downloaded video with uri {}", &down.uri);
             match read_to_vec(ok[0].clone()) {
                 Ok(ok) => {
-                    info!("converted to vec of len {}", ok.len());
                     match fs::remove_dir_all(CONFIG.dlpath.clone()) {
                         Ok(_) => {},
                         Err(err) => error!("failed deleting file; reason: {}", err),
