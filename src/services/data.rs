@@ -46,6 +46,7 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
             info!("successfully downloaded video with uri {}", &down.uri);
             match read_to_vec(ok[0].clone()) {
                 Ok(ok) => {
+                    info!("converted to vec of len {}", ok.len());
                     match fs::remove_dir_all(CONFIG.dlpath.clone()) {
                         Ok(_) => {},
                         Err(err) => error!("failed deleting file; reason: {}", err),
@@ -69,8 +70,8 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
             return HttpResponse::BadRequest().json(json!({ "message":err }))
         },
     };
-
-    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (down.uid, file, mname.to_str(), down.format)) {
+   
+    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (down.uid, file, mname.to_str().unwrap().chars().filter(|c| c.is_ascii()).collect::<String>(), down.format)) {
         Ok(_) => {
             match conn.query_first("SELECT mid FROM media WHERE mtimestamp = (SELECT MAX(mtimestamp) FROM media)").map(|row: Option<i32>| { row.unwrap() }) {
                 Ok(ret) => {
@@ -78,13 +79,13 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
                     return HttpResponse::Ok().json(json!({ "mid":ret, "message":format!("Successfully downloaded {}", down.uri )}))
                 },
                 Err(err) => {
-                    error!("database threw error: {err}");
+                    error!("database threw error: 1 {err}");
                     return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }))
                 },
             };
         },
         Err(err) => {
-            error!("database threw error: {err}");
+            error!("database threw error: 2 {err}");
             return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }))
         },
     };

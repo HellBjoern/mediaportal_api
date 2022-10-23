@@ -30,6 +30,25 @@ Setup mariadb:
 sudo mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
 ```
 
+Switch to superuser:
+
+```bash
+su root
+```
+
+Change maximum packet size for mariadb:
+
+```bash
+echo "[mysqld]
+max_allowed_packet=1G" >> /etc/my.cnf
+```
+
+Exit root:
+
+```bash
+exit
+```
+
 Start mariadb:
 
 ```shell
