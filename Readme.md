@@ -444,3 +444,78 @@ Json deserialize error: ...
     "message": "Database error message"
 }
 ```
+
+## YT_DL
+
+* Downloads specified youtube uri in specific format and stores it on DB
+
+* *ip*:*port*/data/yt_dl
+
+---
+
+**Request**
+
+Example Data:
+
+```json
+{
+    "uid": uid,
+    "uri": "youtube-uri",
+    "format": 1/2/3
+}
+```
+
+(format can be either 1 (audio only), 2 (video only) or 3 (both))
+
+---
+
+**Response**
+
+Success:
+
+```json
+{
+    "message": "Successfully downloaded {uri}",
+    "mid": mid
+}
+```
+
+Failure:
+
+- Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+* File on server failed to be read
+
+```json
+{
+    "message": "Failed reading file; Reason: {reason for error}"
+}
+```
+
+* Supplied format was invalid
+
+```json
+{
+    "message": "Supplied invalid format"
+}
+```
+
+* Supplied YT uri is invalid / network error
+
+```json
+{
+    "message": "Failed to download video; Verify URL"
+}
+```

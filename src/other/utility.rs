@@ -1,8 +1,9 @@
-use std::path::Path;
-use log::{warn, info};
+use std::{path::Path, fs::{File, self}, io::Read};
+use checked_command::CheckedCommand;
+use log::{warn, info, error};
 use mysql::{params, Pool, PooledConn, prelude::Queryable};
 
-use crate::{other::structs::Config, SQL};
+use crate::{other::{structs::Config}, SQL, CONFIG};
 
 //returns sql pooled conn or error as string to be used for error handling
 pub fn get_conn_fn() -> Result<PooledConn, String> {
@@ -36,8 +37,27 @@ pub fn checkname_fn(username: String) -> Result<bool, String>{
     };
 }
 
+//checks if username exists in database; returns true / false or string containing error on failure
+pub fn checkuid_fn(uid: i32) -> Result<bool, String>{
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => return Err(err),
+    };
+
+    match conn.exec_first("SELECT uid FROM users WHERE uid =:uid", params! { "uid" => &uid}).map(|row: Option<i32>| { row }) {
+        Ok(res) => {
+            if res.is_none() {
+                return Ok(false);
+            } else {
+                return Ok(true);
+            }
+        },
+        Err(err) => return Err(err.to_string()),
+    };
+}
+
 //returns if user is marked as logged in database; returns true / false or string containing error on failure
-pub fn logged_fn(username: String) -> Result<bool, String>{
+pub fn logged_uname_fn(username: String) -> Result<bool, String>{
     match checkname_fn(username.clone()) {
         Ok(exists) => {
             if !exists {
@@ -53,6 +73,28 @@ pub fn logged_fn(username: String) -> Result<bool, String>{
     };
 
     match conn.exec_first("SELECT ulogged FROM users WHERE uusername =:uname", params! { "uname" => username }).map(|row: Option<bool>| { row.unwrap() }) {
+        Ok(ret) => return Ok(ret),
+        Err(err) => return Err(err.to_string()),
+    };
+}
+
+//returns if user is marked as logged in database; returns true / false or string containing error on failure
+pub fn _logged_uid_fn(uid: i32) -> Result<bool, String>{
+    match checkuid_fn(uid.clone()) {
+        Ok(exists) => {
+            if !exists {
+                return Err("User does not exist!".to_string());
+            }
+        },
+        Err(err) => return Err(err),
+    };
+
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => return Err(err),
+    };
+
+    match conn.exec_first("SELECT ulogged FROM users WHERE uid =:uid", params! { "uid" => uid }).map(|row: Option<bool>| { row.unwrap() }) {
         Ok(ret) => return Ok(ret),
         Err(err) => return Err(err.to_string()),
     };
@@ -79,5 +121,61 @@ pub fn get_conf() -> Config {
         sqlpwd: "password".to_string(),
         sqlprt: 3306,
         sqldab: "mediaportal".to_string(),
+        dlpath: "./tmp/".to_string(),
     }
+}
+
+//downloads a yt video to folder specified in config; first string is message, second filename for database saving
+pub fn yt_dl(uri: String, format: i32, uid: i32) -> Result<Vec<String>, String>{
+    let args = match format {
+        //audio only
+        1 => {
+            info!("downloading audio only");
+            vec!["-x", "--audio-format", "mp3", "--audio-quality", "0"]
+        },
+        //video only
+        2 => {
+            info!("downloading video only");
+            vec![r#"-f "bv[ext=mp4]/best[ext=mp4]/best"#]
+        },
+        //audio + video
+        3 => {
+            info!("downloading audio + video");
+            vec![r#"-f "bv[ext=mp4]+ba[ext=m4a]/best[ext=mp4]/best"#]
+        },
+        //invalid format
+        _ => {
+            error!("supplied invalid format");
+            return Err("Supplied invalid format".to_string());
+        }
+    };
+
+    let saveloc = format!("-o{}/{}/%(title)s.%(ext)s", CONFIG.dlpath, uid);
+    let output = CheckedCommand::new("yt-dlp").args(&args).arg(&uri).arg(saveloc).spawn().expect("failed to execute process").wait_with_output();
+    match &output {
+        Ok(_) => {
+            let paths = fs::read_dir(format!("{}/{}", CONFIG.dlpath, uid)).unwrap();
+            let mut filenames: Vec<String> = Vec::new();
+            for path in paths {
+                filenames.push(path.unwrap().path().display().to_string());
+            }
+            return Ok(filenames)
+        },
+        Err(_) => return Err("Failed to download video; Verify URL".to_string()),
+    };
+}
+
+pub fn read_to_vec(path: String) -> Result<Vec<u8>, String> {
+    let mut file = match File::open(path) {
+        Ok(file) => file,
+        Err(err) => return Err(format!("failed to open file; reason: {:?}", err)),
+    };
+
+    let mut data = Vec::new();
+    match file.read_to_end(&mut data) {
+        Ok(ok) => info!("read file of size {}", ok),
+        Err(err) => return Err(format!("failed to read file; reason: {}", err)),
+    };
+
+    return Ok(data);
 }

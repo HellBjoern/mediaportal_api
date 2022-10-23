@@ -1,13 +1,15 @@
+CREATE DATABASE  IF NOT EXISTS `mediaportal` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+USE `mediaportal`;
 -- MariaDB dump 10.19  Distrib 10.9.3-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: mediaportal
+-- Host: 127.0.0.1    Database: mediaportal
 -- ------------------------------------------------------
 -- Server version	10.9.3-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -27,20 +29,13 @@ CREATE TABLE `media` (
   `uid` int(11) NOT NULL,
   `mtimestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `mmedia` longblob NOT NULL,
+  `mname` varchar(124) COLLATE latin1_german1_ci NOT NULL,
+  `mformat` int(11) NOT NULL,
   PRIMARY KEY (`mid`),
   KEY `uid` (`uid`),
   CONSTRAINT `media_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `media`
---
-
-LOCK TABLES `media` WRITE;
-/*!40000 ALTER TABLE `media` DISABLE KEYS */;
-/*!40000 ALTER TABLE `media` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `users`
@@ -57,17 +52,8 @@ CREATE TABLE `users` (
   `ulogged` tinyint(4) DEFAULT 0,
   PRIMARY KEY (`uid`),
   UNIQUE KEY `uusername` (`uusername`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `users`
---
-
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -78,4 +64,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-15  0:32:04
+-- Dump completed on 2022-10-23 19:29:08

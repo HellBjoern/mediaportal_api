@@ -38,10 +38,11 @@ async fn main() -> std::io::Result<()> {
             .service(user::add)
             .service(user::login)
             .service(user::logout)
+            .service(user::logged)
             .service(user::chpwd)
             .service(user::check)
-            .service(user::logged)
             .service(data::upload)
+            .service(data::yt_dl)
     })
     .bind((CONFIG.ip.clone(), CONFIG.port))?
     .run()

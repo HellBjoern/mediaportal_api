@@ -44,5 +44,13 @@ pub struct Config {
     pub sqlusr: String,
     pub sqlpwd: String,
     pub sqlprt: u16,
-    pub sqldab: String
+    pub sqldab: String,
+    pub dlpath: String
+}
+
+#[derive(Deserialize)]
+pub struct Yt {
+    pub uid: i32,
+    pub uri: String,
+    pub format: i32
 }

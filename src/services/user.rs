@@ -2,7 +2,7 @@ use actix_web::{post, Responder, web, HttpResponse};
 use log::{warn, info, error};
 use mysql::{prelude::Queryable, params};
 use serde_json::json;
-use crate::other::{utility::{checkname_fn, get_conn_fn, logged_fn}, structs::{Login, Username, User, Chpwd}};
+use crate::other::{utility::{checkname_fn, get_conn_fn, logged_uname_fn}, structs::{Login, Username, User, Chpwd}};
 
 //login service; takes json; responds with either code 400 on error + json msg or on success 200 + json msg
 #[post("/user/login")]
@@ -95,7 +95,7 @@ async fn logout(username: web::Json<Username>) -> impl Responder {
 #[post("/user/logged")]
 async fn logged(username: web::Json<Username>) -> impl Responder {
     info!("[REQ] /user/logged");
-    match logged_fn(username.username.clone()) {
+    match logged_uname_fn(username.username.clone()) {
         Ok(res) => {
             info!("successfully answered logged request");
             return HttpResponse::Ok().json(json!({ "logged":res }))
