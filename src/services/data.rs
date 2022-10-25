@@ -60,7 +60,7 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
             return HttpResponse::BadRequest().json(json!({ "message":err }));
         }
     };
-    let mname = Path::new(&fpath).file_name().unwrap();
+    let mname = Path::new(&fpath).file_name().unwrap().to_str().unwrap().chars().filter(|c| c.is_ascii()).collect::<String>();
 
     let mut conn = match get_conn_fn() {
         Ok(conn) => conn,
@@ -69,13 +69,13 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
             return HttpResponse::BadRequest().json(json!({ "message":err }))
         },
     };
-   
-    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (down.uid, file, mname.to_str().unwrap().chars().filter(|c| c.is_ascii()).collect::<String>(), down.format)) {
+
+    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (down.uid, file, mname.clone(), down.format)) {
         Ok(_) => {
             match conn.query_first("SELECT mid FROM media WHERE mtimestamp = (SELECT MAX(mtimestamp) FROM media)").map(|row: Option<i32>| { row.unwrap() }) {
                 Ok(ret) => {
                     info!("successfully downloaded video and uploaded to db");
-                    return HttpResponse::Ok().json(json!({ "mid":ret, "message":format!("Successfully downloaded {}", down.uri )}))
+                    return HttpResponse::Ok().json(json!({ "mid":ret, "message":format!("Successfully downloaded {}", down.uri), "filename":mname }))
                 },
                 Err(err) => {
                     error!("database threw error: 1 {err}");
