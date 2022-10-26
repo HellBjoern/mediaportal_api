@@ -2,10 +2,10 @@ use std::{fs, path::Path};
 
 use actix_easy_multipart::extractor::MultipartForm;
 use actix_web::{post, Responder, web, HttpResponse};
-use log::{info, warn, error};
+use log::{info, error};
 use mysql::prelude::Queryable;
 use serde_json::json;
-use crate::{other::{structs::{FileUpload, Yt}, utility::{checkuid_fn, read_to_vec, get_conn_fn, logged_uid_fn}}, CONFIG};
+use crate::{other::{structs::{FileUpload, Yt}, utility::{read_to_vec, get_conn_fn, logged_uid_fn}}, CONFIG};
 
 /*
 * Data services
@@ -26,32 +26,19 @@ async fn upload(form: MultipartForm<FileUpload>) -> impl Responder {
 #[post("/data/yt_dl")]
 async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
     info!("[REQ] /data/yt_dl");
-    match checkuid_fn(down.uid.clone()) {
-        Ok(res) => {
-            if !res {
-                warn!("attempted download with invalid uid");
-                return HttpResponse::BadRequest().json(json!({ "message":"Wrong uid!" }));
+    match logged_uid_fn(down.uid.clone()) {
+        Ok(ret) => {
+            if ret {
+                info!("user ist logged in; continuing");
             } else {
-                match logged_uid_fn(down.uid.clone()) {
-                    Ok(ret) => {
-                        if ret {
-                            info!("user logged in");
-                        } else {
-                            error!("user is not logged in; aborting download");
-                            return HttpResponse::BadRequest().json(json!({ "message":"User is not logged in" }))
-                        }
-                    },
-                    Err(err) => {
-                        error!("logged_uid_fn failed with reason: {err}");
-                        return HttpResponse::BadRequest().json(json!({ "message":format!("logged_uid_fn failed with reason: {}", err) }));
-                    }
-                }
+                error!("user is not logged in; aborting download");
+                return HttpResponse::BadRequest().json(json!({ "message":"User is not logged in" }))
             }
         },
         Err(err) => {
-            error!("checkuid_fn failed with error: {err}");
-            return HttpResponse::BadRequest().json(json!({ "message":err }))
-        },
+            error!("logged_uid_fn failed with reason: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }));
+        }
     };
 
     let fpath: String;
