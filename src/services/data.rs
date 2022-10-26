@@ -5,7 +5,7 @@ use actix_web::{post, Responder, web, HttpResponse};
 use log::{info, warn, error};
 use mysql::prelude::Queryable;
 use serde_json::json;
-use crate::{other::{structs::{FileUpload, Yt}, utility::{checkuid_fn, read_to_vec, get_conn_fn}}, CONFIG};
+use crate::{other::{structs::{FileUpload, Yt}, utility::{checkuid_fn, read_to_vec, get_conn_fn, logged_uid_fn}}, CONFIG};
 
 /*
 * Data services
@@ -31,6 +31,21 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
             if !res {
                 warn!("attempted download with invalid uid");
                 return HttpResponse::BadRequest().json(json!({ "message":"Wrong uid!" }));
+            } else {
+                match logged_uid_fn(down.uid.clone()) {
+                    Ok(ret) => {
+                        if ret {
+                            info!("user logged in");
+                        } else {
+                            error!("user is not logged in; aborting download");
+                            return HttpResponse::BadRequest().json(json!({ "message":"User is not logged in" }))
+                        }
+                    },
+                    Err(err) => {
+                        error!("logged_uid_fn failed with reason: {err}");
+                        return HttpResponse::BadRequest().json(json!({ "message":format!("logged_uid_fn failed with reason: {}", err) }));
+                    }
+                }
             }
         },
         Err(err) => {

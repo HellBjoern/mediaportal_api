@@ -79,7 +79,7 @@ pub fn logged_uname_fn(username: String) -> Result<bool, String>{
 }
 
 //returns if user is marked as logged in database; returns true / false or string containing error on failure
-pub fn _logged_uid_fn(uid: i32) -> Result<bool, String>{
+pub fn logged_uid_fn(uid: i32) -> Result<bool, String>{
     match checkuid_fn(uid.clone()) {
         Ok(exists) => {
             if !exists {
