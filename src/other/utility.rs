@@ -1,6 +1,6 @@
 use std::{path::Path, fs::{File, self}, io::Read};
 use checked_command::CheckedCommand;
-use log::{warn, info, error};
+use log::{warn, info};
 use mysql::{params, Pool, PooledConn, prelude::Queryable};
 
 use crate::{other::{structs::Config}, SQL, CONFIG};
@@ -145,7 +145,6 @@ pub fn yt_dl(uri: String, format: i32, uid: i32) -> Result<Vec<String>, String>{
         },
         //invalid format
         _ => {
-            error!("supplied invalid format");
             return Err("Supplied invalid format".to_string());
         }
     };
