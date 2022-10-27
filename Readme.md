@@ -9,7 +9,7 @@
 Install rustup and mariadb e.g:
 
 ```shell
-yay -S rustup mariadb
+yay -S rustup mariadb yt-dlp
 ```
 
 Setup the rustup toolchain:
