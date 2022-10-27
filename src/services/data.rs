@@ -42,13 +42,13 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
     };
 
     let fpath: String;
-    let file = match crate::other::utility::yt_dl(down.uri.clone(), down.format, down.uid) {
-        Ok(ok) => {
-            fpath = ok[0].clone();
+    let file = match crate::other::utility::yt_dl(down.uri.clone(), down.format) {
+        Ok(ok1) => {
+            fpath = ok1.0[0].clone();
             info!("successfully downloaded video with uri {}", &down.uri);
-            match read_to_vec(ok[0].clone()) {
+            match read_to_vec(ok1.0[0].clone()) {
                 Ok(ok) => {
-                    match fs::remove_dir_all(CONFIG.dlpath.clone()) {
+                    match fs::remove_dir_all(format!("{}/{}", CONFIG.dlpath.clone(), ok1.1)) {
                         Ok(_) => {},
                         Err(err) => error!("failed deleting file; reason: {}", err),
                     }

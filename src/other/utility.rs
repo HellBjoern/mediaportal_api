@@ -2,8 +2,11 @@ use std::{path::Path, fs::{File, self}, io::Read};
 use checked_command::CheckedCommand;
 use log::{warn, info};
 use mysql::{params, Pool, PooledConn, prelude::Queryable};
+use rand::distributions::{Alphanumeric, DistString};
 
 use crate::{other::{structs::Config}, SQL, CONFIG};
+
+
 
 //returns sql pooled conn or error as string to be used for error handling
 pub fn get_conn_fn() -> Result<PooledConn, String> {
@@ -126,7 +129,7 @@ pub fn get_conf() -> Config {
 }
 
 //downloads a yt video to folder specified in config; first string is message, second filename for database saving
-pub fn yt_dl(uri: String, format: i32, uid: i32) -> Result<Vec<String>, String>{
+pub fn yt_dl(uri: String, format: i32) -> Result<(Vec<String>, String), String>{
     let args = match format {
         //audio only
         1 => {
@@ -149,16 +152,21 @@ pub fn yt_dl(uri: String, format: i32, uid: i32) -> Result<Vec<String>, String>{
         }
     };
 
-    let saveloc = format!("-o{}/{}/%(title)s.%(ext)s", CONFIG.dlpath, uid);
+    let fdlname = match create_tmp_name() {
+        Ok(ok) => ok,
+        Err(err) => return Err(format!("Failed to create tmp name {}", err)),
+    };
+
+    let saveloc = format!("-o{}/{}/%(title)s.%(ext)s", CONFIG.dlpath, fdlname.clone());
     let output = CheckedCommand::new("yt-dlp").args(&args).arg(&uri).arg(saveloc).spawn().expect("failed to execute process").wait_with_output();
     match &output {
         Ok(_) => {
-            let paths = fs::read_dir(format!("{}/{}", CONFIG.dlpath, uid)).unwrap();
+            let paths = fs::read_dir(format!("{}/{}", CONFIG.dlpath, fdlname.clone())).unwrap();
             let mut filenames: Vec<String> = Vec::new();
             for path in paths {
                 filenames.push(path.unwrap().path().display().to_string());
             }
-            return Ok(filenames)
+            return Ok((filenames, fdlname.clone()))
         },
         Err(_) => return Err("Failed to download video; Verify URL".to_string()),
     };
@@ -177,4 +185,29 @@ pub fn read_to_vec(path: String) -> Result<Vec<u8>, String> {
     };
 
     return Ok(data);
+}
+
+pub fn create_tmp_name() -> Result<String, String> {
+    match fs::create_dir_all(CONFIG.dlpath.clone()) {
+        Ok(_) => {},
+        Err(err) => return Err(format!("Failed creating tmp folder; Reason: {}", err)), 
+    };
+
+    let exists = match fs::read_dir(format!("{}/", CONFIG.dlpath.clone())) {
+        Ok(ok) => ok,
+        Err(err) => return Err(format!("Failed to read tmp dir; Reason: {}", err)),
+    };
+    let mut taken: Vec<String> = Vec::new();
+    for f in exists {
+        taken.push(f.unwrap().path().file_name().unwrap().to_str().unwrap().to_string());
+    }
+
+    let mut rand: String;
+    loop {
+        rand = Alphanumeric.sample_string(&mut rand::thread_rng(), 16);
+        if !taken.contains(&rand) {
+            break;
+        }
+    }
+    return Ok(rand);
 }
