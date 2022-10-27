@@ -45,7 +45,6 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
     let file = match crate::other::utility::yt_dl(down.uri.clone(), down.format) {
         Ok(ok1) => {
             fpath = ok1.0[0].clone();
-            info!("successfully downloaded video with uri {}", &down.uri);
             match read_to_vec(ok1.0[0].clone()) {
                 Ok(ok) => {
                     match fs::remove_dir_all(format!("{}/{}", CONFIG.dlpath.clone(), ok1.1)) {
@@ -72,11 +71,11 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
         },
     };
 
-    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (down.uid, file, mname.clone(), down.format)) {
+    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (down.uid, &file, mname.clone(), down.format)) {
         Ok(_) => {
             match conn.query_first("SELECT mid FROM media WHERE mtimestamp = (SELECT MAX(mtimestamp) FROM media)").map(|row: Option<i32>| { row.unwrap() }) {
                 Ok(ret) => {
-                    info!("successfully downloaded video and uploaded to db");
+                    info!("successfully downloaded video and uploaded to db; size was {}", file.len());
                     return HttpResponse::Ok().json(json!({ "mid":ret, "message":format!("Successfully downloaded {}", down.uri), "filename":mname }))
                 },
                 Err(err) => {

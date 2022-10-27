@@ -180,7 +180,7 @@ pub fn read_to_vec(path: String) -> Result<Vec<u8>, String> {
 
     let mut data = Vec::new();
     match file.read_to_end(&mut data) {
-        Ok(ok) => info!("read file of size {}", ok),
+        Ok(_) => {},
         Err(err) => return Err(format!("failed to read file; reason: {}", err)),
     };
 

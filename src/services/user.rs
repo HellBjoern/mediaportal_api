@@ -137,7 +137,7 @@ async fn add(user: web::Json<User>) -> impl Responder {
             match conn.exec_first("SELECT uid, uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &user.username}).map(|row| { row.map(|(uid, uusername, upassword)| Login { id: uid, username: uusername, password: upassword }) }) {
                 Ok(res) => {
                     if !res.is_none() {
-                        info!("successfully added user");
+                        info!("successfully added user; logging in");
                         return HttpResponse::Ok().json(json!({ "id":&res.as_ref().unwrap().id, "username":res.as_ref().unwrap().username }));
                     } else {
                         error!("weird database error; shouldnt happen?");
