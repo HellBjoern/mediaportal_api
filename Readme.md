@@ -515,6 +515,22 @@ Json deserialize error: ...
 }
 ```
 
+- User not logged in
+
+```json
+{
+    "message": "User is not logged in"
+}
+```
+
+- Uid does not exist
+
+```json
+{
+    "message": "User does not exist!"
+}
+```
+
 * File on server failed to be read
 
 ```json
