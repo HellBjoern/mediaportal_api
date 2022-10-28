@@ -129,7 +129,7 @@ pub fn get_conf() -> Config {
 }
 
 //downloads a yt video to folder specified in config; first string is message, second filename for database saving
-pub fn yt_dl(uri: String, format: i32) -> Result<(Vec<String>, String), String>{
+pub fn yt_dl(uri: String, format: i32) -> Result<(Vec<String>, String), String> {
     let args = match format {
         //audio only
         1 => {

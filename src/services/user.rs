@@ -197,7 +197,7 @@ async fn chpwd(chpwd: web::Json<Chpwd>) -> impl Responder {
                 };
             } else {
                 warn!("attempted chpwd with invalid credentials");
-                return HttpResponse::BadRequest().json(json!({ "message":"Wrong Credentials!" }));
+                return HttpResponse::BadRequest().json(json!({ "message":"Old password invalid!" }));
             }
         },
         Err(err) => {

@@ -1,5 +1,4 @@
 use std::{fs, path::Path};
-
 use actix_easy_multipart::extractor::MultipartForm;
 use actix_web::{post, Responder, web, HttpResponse};
 use log::{info, error};
@@ -20,7 +19,7 @@ async fn upload(form: MultipartForm<FileUpload>) -> impl Responder {
     }
 
     //return HttpResponse::new(StatusCode::from_u16(690).unwrap()).json();
-    return actix_web::HttpResponse::BadRequest().json(json!({ "code":"69", "message":"olls hin"}));
+    return HttpResponse::BadRequest().json(json!({ "code":"69", "message":"olls hin"}));
 }
 
 #[post("/data/yt_dl")]
@@ -79,13 +78,13 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
                     return HttpResponse::Ok().json(json!({ "mid":ret, "message":format!("Successfully downloaded {}", down.uri), "filename":mname }))
                 },
                 Err(err) => {
-                    error!("database threw error: 1 {err}");
+                    error!("database threw error: {err}");
                     return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }))
                 },
             };
         },
         Err(err) => {
-            error!("database threw error: 2 {err}");
+            error!("database threw error: {err}");
             return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }))
         },
     };
