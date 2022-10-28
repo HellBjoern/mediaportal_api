@@ -43,6 +43,7 @@ async fn main() -> std::io::Result<()> {
             .service(user::check)
             .service(data::upload)
             .service(data::yt_dl)
+            .service(data::medialist)
     })
     .bind((CONFIG.ip.clone(), CONFIG.port))?
     .run()

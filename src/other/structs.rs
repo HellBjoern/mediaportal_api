@@ -54,3 +54,15 @@ pub struct Yt {
     pub uri: String,
     pub format: i32
 }
+
+#[derive(Deserialize, Debug)]
+pub struct Media {
+    pub mid: i32,
+    pub mname: String,
+    pub mformat: i32
+}
+
+# [derive(Deserialize)]
+pub struct Uid {
+    pub uid: i32
+}

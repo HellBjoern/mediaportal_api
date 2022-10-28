@@ -1,10 +1,10 @@
 use std::{fs, path::Path};
 use actix_easy_multipart::extractor::MultipartForm;
 use actix_web::{post, Responder, web, HttpResponse};
-use log::{info, error};
-use mysql::prelude::Queryable;
+use log::{info, error, warn};
+use mysql::{prelude::Queryable, params};
 use serde_json::json;
-use crate::{other::{structs::{FileUpload, Yt}, utility::{read_to_vec, get_conn_fn, logged_uid_fn}}, CONFIG};
+use crate::{other::{structs::{FileUpload, Yt, Uid, Media}, utility::{read_to_vec, get_conn_fn, logged_uid_fn, checkuid_fn}}, CONFIG};
 
 /*
 * Data services
@@ -20,6 +20,38 @@ async fn upload(form: MultipartForm<FileUpload>) -> impl Responder {
 
     //return HttpResponse::new(StatusCode::from_u16(690).unwrap()).json();
     return HttpResponse::BadRequest().json(json!({ "code":"69", "message":"olls hin"}));
+}
+
+#[post("/data/medialist")]
+async fn medialist(user: web::Json<Uid>) -> impl Responder {
+    match checkuid_fn(user.uid) {
+        Ok(ok) => {
+            if !ok {
+                warn!("attempted medialist for invalid user");
+                return HttpResponse::BadRequest().json(json!({ "message":"User does not exist!" }));
+            }
+        },
+        Err(err) => {
+            warn!("checkuid_fn failed; reason: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }));
+        },
+    };
+
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => {
+            error!("get_conn_fn failed with error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }))
+        },
+    };
+
+
+    let media = conn.exec_map("SELECT mind, mname, mformat FROM media WHERE uid =:uid", params! {"uid" => user.uid })
+    //let media = conn.exec("SELECT mid, mname, mformat FROM media WHERE uid =:uid", params! { "uid" => user.uid }).map(|row| {
+    //    row.map(|(mid, mname, mformat)| Media { mid: mid, mname: mname, mformat: mformat })});
+
+    println!("media: {:?}", media.unwrap());
+    return HttpResponse::Ok().json(json!({ "message":"guat" }));
 }
 
 #[post("/data/yt_dl")]
@@ -44,7 +76,7 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
     let file = match crate::other::utility::yt_dl(down.uri.clone(), down.format) {
         Ok(ok1) => {
             fpath = ok1.0[0].clone();
-            match read_to_vec(ok1.0[0].clone()) {
+            match read_to_vec(fpath.clone()) {
                 Ok(ok) => {
                     match fs::remove_dir_all(format!("{}/{}", CONFIG.dlpath.clone(), ok1.1)) {
                         Ok(_) => {},
