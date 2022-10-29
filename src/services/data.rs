@@ -3,7 +3,7 @@ use actix_easy_multipart::extractor::MultipartForm;
 use actix_web::{post, Responder, web, HttpResponse};
 use log::{info, error, warn};
 use mysql::{prelude::Queryable, params};
-use serde_json::json;
+use serde_json::{json, Map};
 use crate::{other::{structs::{FileUpload, Yt, Uid, Media}, utility::{read_to_vec, get_conn_fn, logged_uid_fn, checkuid_fn}}, CONFIG};
 
 /*
@@ -24,6 +24,7 @@ async fn upload(form: MultipartForm<FileUpload>) -> impl Responder {
 
 #[post("/data/medialist")]
 async fn medialist(user: web::Json<Uid>) -> impl Responder {
+    info!("[REQ] /data/yt_dl");
     match checkuid_fn(user.uid) {
         Ok(ok) => {
             if !ok {
@@ -46,12 +47,24 @@ async fn medialist(user: web::Json<Uid>) -> impl Responder {
     };
 
 
-    let media = conn.exec_map("SELECT mind, mname, mformat FROM media WHERE uid =:uid", params! {"uid" => user.uid })
-    //let media = conn.exec("SELECT mid, mname, mformat FROM media WHERE uid =:uid", params! { "uid" => user.uid }).map(|row| {
-    //    row.map(|(mid, mname, mformat)| Media { mid: mid, mname: mname, mformat: mformat })});
+    let media = match conn.exec_map("SELECT mid, mname, mformat FROM media WHERE uid =:uid", params! {"uid" => user.uid }, |(mid, mname, mformat)| Media { mid, mname, mformat }) {
+        Ok(ok) => ok,
+        Err(err) => {
+            error!("database threw error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }));
+        }
+    };
 
-    println!("media: {:?}", media.unwrap());
-    return HttpResponse::Ok().json(json!({ "message":"guat" }));
+
+    let mut list = Map::new();
+    let mut i = 0;
+    for m in media {
+        list.insert(i.to_string(), json!(m) );
+        i += 1;
+    }
+
+    info!("successfully built list; sending");
+    return HttpResponse::Ok().json(list);
 }
 
 #[post("/data/yt_dl")]

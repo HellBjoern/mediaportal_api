@@ -1,5 +1,5 @@
 use actix_easy_multipart::{FromMultipart, File};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /*
 * Structs
@@ -55,7 +55,7 @@ pub struct Yt {
     pub format: i32
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 pub struct Media {
     pub mid: i32,
     pub mname: String,
