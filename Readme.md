@@ -133,6 +133,10 @@ On Success Code is 200
 
 On Error / Failure / Other Code is 400
 
+
+
+## User operations
+
 ## Login
 
 * Checks credentials and on success returns user + uid
@@ -464,6 +468,10 @@ Json deserialize error: ...
 }
 ```
 
+---
+
+## Data operations
+
 ## YT_DL
 
 * Downloads specified youtube uri in specific format and stores it on DB
@@ -552,5 +560,72 @@ Json deserialize error: ...
 ```json
 {
     "message": "Failed to download video; Verify URL"
+}
+```
+
+## Medialist
+
+- Returns all media linked to a user
+
+- *ip*:*port*/data/medialist
+
+---
+
+**Request**
+
+Example Data:
+
+```json
+{
+    "uid": uid,
+}
+```
+
+---
+
+**Response**
+
+Success:
+
+```json
+{
+    "0": {
+        "mformat": 1/2/3,
+        "mid": mid,
+        "mname": "Video name.mp3/4"
+    },
+    "1": {
+        "mformat": ...
+    }
+}
+```
+
+If no files are present, return will be:
+
+```json
+{}
+```
+
+**Failure**
+
+- Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+- Uid does not exist
+
+```json
+{
+    "message": "User does not exist!"
 }
 ```
