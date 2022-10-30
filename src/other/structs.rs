@@ -66,3 +66,9 @@ pub struct Media {
 pub struct Uid {
     pub uid: i32
 }
+
+#[derive(Deserialize)]
+pub struct Down {
+    pub uid: i32,
+    pub mid: i32
+}

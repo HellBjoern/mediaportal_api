@@ -133,8 +133,6 @@ On Success Code is 200
 
 On Error / Failure / Other Code is 400
 
-
-
 ## User operations
 
 ## Login
@@ -577,7 +575,7 @@ Example Data:
 
 ```json
 {
-    "uid": uid,
+    "uid": uid
 }
 ```
 
@@ -627,5 +625,74 @@ Json deserialize error: ...
 ```json
 {
     "message": "User does not exist!"
+}
+```
+
+## Download
+
+- Responds with requested media as binary/octet-stream
+
+- *ip*:*port*/data/download
+
+---
+
+**Request**
+
+Example Data:
+
+```json
+{
+    "uid": uid,
+    "mid": mid
+}
+```
+
+---
+
+**Response**
+
+Success:
+
+Sends the media as octet-stream;
+
+
+
+**Failure**
+
+- Sent invalid Json
+
+```json
+Json deserialize error: ...
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+- Uid does not exist
+
+```json
+{
+    "message": "User does not exist!"
+}
+```
+
+* Mid does not exist / user does not own mid
+
+```json
+{
+    "message": "Invalid mid!"
+}
+```
+
+* User not logged in
+
+```json
+{
+    "message": "User is not logged in!"
 }
 ```

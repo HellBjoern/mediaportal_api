@@ -4,7 +4,7 @@ use actix_web::{post, Responder, web, HttpResponse};
 use log::{info, error, warn};
 use mysql::{prelude::Queryable, params};
 use serde_json::{json, Map};
-use crate::{other::{structs::{FileUpload, Yt, Uid, Media}, utility::{read_to_vec, get_conn_fn, logged_uid_fn, checkuid_fn}}, CONFIG};
+use crate::{other::{structs::{FileUpload, Yt, Uid, Media, Down}, utility::{read_to_vec, get_conn_fn, logged_uid_fn, checkuid_fn}}, CONFIG};
 
 /*
 * Data services
@@ -24,7 +24,7 @@ async fn upload(form: MultipartForm<FileUpload>) -> impl Responder {
 
 #[post("/data/medialist")]
 async fn medialist(user: web::Json<Uid>) -> impl Responder {
-    info!("[REQ] /data/yt_dl");
+    info!("[REQ] /data/medialist");
     match checkuid_fn(user.uid) {
         Ok(ok) => {
             if !ok {
@@ -119,7 +119,7 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
         Ok(_) => {
             match conn.query_first("SELECT mid FROM media WHERE mtimestamp = (SELECT MAX(mtimestamp) FROM media)").map(|row: Option<i32>| { row.unwrap() }) {
                 Ok(ret) => {
-                    info!("successfully downloaded video and uploaded to db; size was {}", file.len());
+                    info!("successfully downloaded video and uploaded to db; size was {}mb", (file.len()/(1024*1024)));
                     return HttpResponse::Ok().json(json!({ "mid":ret, "message":format!("Successfully downloaded {}", down.uri), "filename":mname }))
                 },
                 Err(err) => {
@@ -127,6 +127,54 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
                     return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }))
                 },
             };
+        },
+        Err(err) => {
+            error!("database threw error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err.to_string() }))
+        },
+    };
+}
+
+#[post("/data/download")]
+async fn download(down: web::Json<Down>) -> impl Responder {
+    info!("[REQ] /data/download");
+    match logged_uid_fn(down.uid.clone()) {
+        Ok(ret) => {
+            if ret {
+                info!("user ist logged in; continuing");
+            } else {
+                error!("user is not logged in; aborting download");
+                return HttpResponse::BadRequest().json(json!({ "message":"User is not logged in" }))
+            }
+        },
+        Err(err) => {
+            error!("logged_uid_fn failed with reason: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }));
+        }
+    };
+
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => {
+            error!("get_conn_fn failed with error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }))
+        },
+    };
+
+    match conn.exec_first("SELECT mmedia FROM media WHERE uid =:uid AND mid =:mid", params! { "uid" => down.uid, "mid" => down.mid }).map(|row: Option<Vec<u8>>| { row }) {
+        Ok(ret) => {
+            match ret {
+                Some(ret) => {
+                    info!("successfully fetched video from db; size was {}mb", (ret.len()/(1024*1024)));
+                    info!("attempting to send response");
+                    return HttpResponse::Ok().content_type("binary/octet-stream").body(ret)
+                },
+                None => {
+                    warn!("tried retrieving invalid mid");
+                    return HttpResponse::BadRequest().json(json!({ "message":"Invalid mid!"}));
+                }
+            }
+            
         },
         Err(err) => {
             error!("database threw error: {err}");
