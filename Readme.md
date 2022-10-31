@@ -6,10 +6,10 @@
 
 ### Linux
 
-Install rustup and mariadb e.g:
+Install required tools e.g:
 
 ```shell
-yay -S rustup mariadb yt-dlp
+yay -S rustup mariadb yt-dlp ffmpeg
 ```
 
 Setup the rustup toolchain:
@@ -171,7 +171,7 @@ Failure:
 
 * Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -225,7 +225,7 @@ Failure:
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -279,7 +279,7 @@ Failure:
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -335,7 +335,7 @@ Failure:
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -400,7 +400,7 @@ Failure:
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -454,7 +454,7 @@ Failure:
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -509,7 +509,7 @@ Failure:
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -545,7 +545,7 @@ Json deserialize error: ...
 }
 ```
 
-* Supplied format was invalid
+* Supplied format index was invalid
 
 ```json
 {
@@ -608,7 +608,7 @@ If no files are present, return will be:
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -655,13 +655,11 @@ Success:
 
 Sends the media as octet-stream;
 
-
-
 **Failure**
 
 - Sent invalid Json
 
-```json
+```
 Json deserialize error: ...
 ```
 
@@ -696,3 +694,99 @@ Json deserialize error: ...
     "message": "User is not logged in!"
 }
 ```
+
+## Convert
+
+- Converts supplied media to format specified and saves it to DB
+
+- *ip*:*port*/data/convert
+
+---
+
+**Request**
+
+Example Data:
+
+```
+{
+    "uid": uid,
+    "file": file,
+    "format": 1/2/3
+}
+```
+
+Data expected is multipart/form
+
+(format can be either 1 (audio only), 2 (video only) or 3 (both))
+
+---
+
+**Response**
+
+Success:
+
+```json
+{
+    "filename": videoname,
+    "message": "Successfully converted to {new filename}",
+    "mid": mid
+}
+```
+
+Failure:
+
+- Sent invalid Json
+
+```
+Json deserialize error: ...
+```
+
+- Database Error
+
+```json
+{
+    "message": "Database error message"
+}
+```
+
+- User not logged in
+
+```json
+{
+    "message": "User is not logged in"
+}
+```
+
+- Uid does not exist
+
+```json
+{
+    "message": "User does not exist!"
+}
+```
+
+- File on server failed to be read
+
+```json
+{
+    "message": "Failed reading file; Reason: {reason for error}"
+}
+```
+
+- Conversion failed
+
+```json
+{
+    "message": "Failed to convert media; Check format / content!"
+}
+```
+
+- Supplied format index was invalid
+
+```json
+{
+    "message": "Supplied invalid format"
+}
+```
+
+- 

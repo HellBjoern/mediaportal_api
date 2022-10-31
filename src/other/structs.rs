@@ -6,8 +6,9 @@ use serde::{Deserialize, Serialize};
 */
 #[derive(FromMultipart)]
 pub struct FileUpload {
-    pub description: Option<String>,
-    pub file: File
+    pub file: File,
+    pub format: i32,
+    pub uid: i32
 }
 
 #[derive(Deserialize)]
@@ -45,7 +46,7 @@ pub struct Config {
     pub sqlpwd: String,
     pub sqlprt: u16,
     pub sqldab: String,
-    pub dlpath: String
+    pub tmppath: String
 }
 
 #[derive(Deserialize)]

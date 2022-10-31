@@ -1,4 +1,5 @@
 use actix_cors::Cors;
+use actix_easy_multipart::extractor::MultipartFormConfig;
 use actix_web::{App, HttpServer, http::header};
 use log::info;
 use lazy_static::lazy_static;
@@ -35,13 +36,14 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600);
         App::new()
             .wrap(cors)
+            .app_data(MultipartFormConfig::default().file_limit(100 * 1024 * 1024 * 1024))
             .service(user::add)
             .service(user::login)
             .service(user::logout)
             .service(user::logged)
             .service(user::chpwd)
             .service(user::check)
-            .service(data::upload)
+            .service(data::convert)
             .service(data::yt_dl)
             .service(data::medialist)
             .service(data::download)

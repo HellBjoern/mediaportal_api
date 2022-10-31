@@ -124,7 +124,7 @@ pub fn get_conf() -> Config {
         sqlpwd: "password".to_string(),
         sqlprt: 3306,
         sqldab: "mediaportal".to_string(),
-        dlpath: "./tmp/".to_string(),
+        tmppath: "./tmp/".to_string(),
     }
 }
 
@@ -157,11 +157,11 @@ pub fn yt_dl(uri: String, format: i32) -> Result<(Vec<String>, String), String> 
         Err(err) => return Err(format!("Failed to create tmp name {}", err)),
     };
 
-    let saveloc = format!("-o{}/{}/%(title)s.%(ext)s", CONFIG.dlpath, fdlname.clone());
+    let saveloc = format!("-o{}/{}/%(title)s.%(ext)s", CONFIG.tmppath, fdlname.clone());
     let output = CheckedCommand::new("yt-dlp").args(&args).arg(&uri).arg(saveloc).spawn().expect("failed to execute process").wait_with_output();
     match &output {
         Ok(_) => {
-            let paths = fs::read_dir(format!("{}/{}", CONFIG.dlpath, fdlname.clone())).unwrap();
+            let paths = fs::read_dir(format!("{}/{}", CONFIG.tmppath, fdlname.clone())).unwrap();
             let mut filenames: Vec<String> = Vec::new();
             for path in paths {
                 filenames.push(path.unwrap().path().display().to_string());
@@ -188,12 +188,12 @@ pub fn read_to_vec(path: String) -> Result<Vec<u8>, String> {
 }
 
 pub fn create_tmp_name() -> Result<String, String> {
-    match fs::create_dir_all(CONFIG.dlpath.clone()) {
+    match fs::create_dir_all(CONFIG.tmppath.clone()) {
         Ok(_) => {},
         Err(err) => return Err(format!("Failed creating tmp folder; Reason: {}", err)), 
     };
 
-    let exists = match fs::read_dir(format!("{}/", CONFIG.dlpath.clone())) {
+    let exists = match fs::read_dir(format!("{}/", CONFIG.tmppath.clone())) {
         Ok(ok) => ok,
         Err(err) => return Err(format!("Failed to read tmp dir; Reason: {}", err)),
     };
@@ -209,5 +209,61 @@ pub fn create_tmp_name() -> Result<String, String> {
             break;
         }
     }
+    println!("{}", rand);
     return Ok(rand);
+}
+
+
+pub fn ffmpeg(format: i32, infile: String, mut fname: String) -> Result<String, String> {
+
+    //replaces everything after last . with "" to remove file extensions
+    let offset = fname.find(".").unwrap_or(fname.len());
+    fname.replace_range(offset.., "");
+    
+    //input file as argument for ffmpeg
+    let input = vec!["-i", &infile];
+
+    //random path in tmp
+    let rndpath = match create_tmp_name() {
+        Ok(ok) => format!("{}/{}", CONFIG.tmppath, ok),
+        Err(err) => return Err(format!("Failed to create tmp name {}", err)),
+    };
+    match fs::create_dir_all(rndpath.clone()) {
+        Ok(_) => {},
+        Err(err) => return Err(format!("Failed creating tmp folder; Reason: {}", err)), 
+    };
+    //thisll be returned in order to find converted output file
+    let outfile: String;
+    let outargs = match format {
+        //audio only
+        1 => {
+            info!("converting to mp3");
+            outfile = format!("{}/{}.mp3", rndpath, fname);
+            vec![outfile.clone()]
+        },
+        //video only
+        2 => {
+            info!("muting video");
+            outfile = format!("{}/{}.mp4", rndpath, fname);
+            vec!["-an".to_string(), outfile.clone()]
+        },
+        //audio + video
+        3 => {
+            info!("converting to mp4");
+            outfile = format!("{}/{}.mp4", rndpath, fname);
+            vec![outfile.clone()]
+        },
+        //invalid format
+        _ => {
+            return Err("Supplied invalid format".to_string());
+        }
+    };
+
+    let output = CheckedCommand::new("ffmpeg").args(input).args(outargs).spawn().expect("failed to execute process").wait_with_output();
+    match &output {
+        Ok(_) => {
+            return Ok(outfile);
+        },
+        Err(_) => return Err("Failed to convert media; Check format / content!".to_string()),
+    };
 }

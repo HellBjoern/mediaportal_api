@@ -11,5 +11,5 @@ sqlpwd = "password"
 #database to use on sql server
 sqldab = "mediaportal"
 
-#yt-dlp output location; DO NOT end folders with a /
-dlpath = "tmp"
+#temporary working location; DO NOT end folders with a /
+tmppath = "tmp"
