@@ -2,6 +2,7 @@ use actix_web::{post, Responder, web, HttpResponse};
 use log::{warn, info, error};
 use mysql::{prelude::Queryable, params};
 use serde_json::json;
+use pwhash::bcrypt;
 use crate::other::{utility::{checkname_fn, get_conn_fn, logged_uname_fn}, structs::{Login, Username, User, Chpwd}};
 
 //login service; takes json; responds with either code 400 on error + json msg or on success 200 + json msg
@@ -31,7 +32,7 @@ async fn login(valuser: web::Json<Login>) -> impl Responder {
 
     match conn.exec_first("SELECT uid, uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &valuser.username}).map(|row| { row.map(|(uid, uusername, upassword)| Login { id: uid, username: uusername, password: upassword }) }) {
         Ok(res) => {
-            if !res.is_none() && res.as_ref().unwrap().password == valuser.password {
+            if !res.is_none() && bcrypt::verify(valuser.password.clone(), &res.as_ref().unwrap().password) {
                 match conn.exec_drop("UPDATE users SET ulogged = 1 WHERE uusername=:uname", params! { "uname" => &valuser.username}) {
                     Ok(_) => {
                         info!("successfully logged user in");
@@ -132,7 +133,7 @@ async fn add(user: web::Json<User>) -> impl Responder {
         },
     };
 
-    match conn.exec_drop("INSERT INTO users(uusername, uemail, upassword) VALUES (?, ?, ?)", (&user.username, &user.email, &user.password)) {
+    match conn.exec_drop("INSERT INTO users(uusername, uemail, upassword) VALUES (?, ?, ?)", (&user.username, &user.email, bcrypt::hash(&user.password).unwrap())) {
         Ok(_) => {
             match conn.exec_first("SELECT uid, uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &user.username}).map(|row| { row.map(|(uid, uusername, upassword)| Login { id: uid, username: uusername, password: upassword }) }) {
                 Ok(res) => {
@@ -184,8 +185,8 @@ async fn chpwd(chpwd: web::Json<Chpwd>) -> impl Responder {
 
     match conn.exec_first("SELECT uid, uusername, upassword FROM users WHERE uusername =:uname", params! { "uname" => &chpwd.username}).map(|row| { row.map(|(uid, uusername, upassword)| Login { id: uid, username: uusername, password: upassword }) }) {
         Ok(res) => {
-            if !res.is_none() && res.as_ref().unwrap().password == chpwd.oldpwd {
-                match conn.exec_drop("UPDATE users SET upassword =:npwd WHERE uusername=:uname", params! { "npwd" => &chpwd.newpwd,  "uname" => &chpwd.username}) {
+            if !res.is_none() && bcrypt::verify(chpwd.oldpwd.clone(), &res.as_ref().unwrap().password) {
+                match conn.exec_drop("UPDATE users SET upassword =:npwd WHERE uusername=:uname", params! { "npwd" => bcrypt::hash(&chpwd.newpwd).unwrap(),  "uname" => &chpwd.username}) {
                     Ok(_) => {
                         info!("successfully changed password");
                         return HttpResponse::Ok().json(json!({ "message":"Changed password successfully!" }))
