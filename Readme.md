@@ -4,8 +4,79 @@
 
 ## Table of contents
 
-1. [Setup Instructions](#1-setup-instructions)
-   1. 1 [Linux](#11-linux)
+* [1. Setup Instructions](#1-setup-instructions)
+  
+  * [1.1 Linux](#11-linux)
+  
+  * [1.2 Windows](#12-windows)
+
+* [2. General](#2-general)
+
+* [3. User operations](#3-user-operations)
+  
+  * [3.1 Login](#31-login)
+    
+    * [3.11 Request](#311-request)
+    
+    * [3.12 Response](#312-response)
+  
+  * [3.2 Logout](#32-logout)
+    
+    * [3.21 Request](#321-request)
+    
+    * [3.22 Response](#322-response)
+  
+  * [3.3 Logged](#33-logged)
+    
+    * [3.31 Request](#331-request)
+    
+    * [3.32 Response](#332-response)
+  
+  * [3.4 Chpwd](#34-chpwd)
+    
+    * [3.41 Request](#341-request)
+    
+    * [3.42 Response](#342-response)
+  
+  * [3.5 Add](#35-add)
+    
+    * [3.51 Request](#351-request)
+    
+    * [3.52 Response](#352-response)
+  
+  * [3.6 Check](#36-check)
+    
+    * [3.61 Request](#361-request)
+    
+    * [3.62 Response](#362-response)
+
+* [4.  Data operations](#4-data-operations)
+  
+  * [4.1 YT_DL](#41-yt_dl)
+    
+    * [4.11 Request](#411-request)
+    
+    * [4.12 Response](#412-response)
+  
+  * [4.2 Medialist](#42-medialist)
+    
+    * [4.21 Request](#421-request)
+    
+    * [4.22 Response](#422-response)
+  
+  * [4.3 Download](#43-download)
+    
+    * [4.31 Request](#431-request)
+    
+    * [4.32 Respone](#432-response)
+  
+  * [4.4 Convert](#44-convert)
+    
+    * [4.41 Request](#441-request)
+    
+    * [4.42 Response](#442-response)
+
+---
 
 ## 1. Setup instructions
 
@@ -473,7 +544,7 @@ Json deserialize error: ...
 
 ---
 
-## 4 Data operations
+## 4. Data operations
 
 ## 4.1 YT_DL
 
@@ -792,5 +863,5 @@ Json deserialize error: ...
 ```json
 {
     "message": "Supplied invalid format"
-}`
+}
 ```
