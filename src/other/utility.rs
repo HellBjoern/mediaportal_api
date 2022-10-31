@@ -209,7 +209,6 @@ pub fn create_tmp_name() -> Result<String, String> {
             break;
         }
     }
-    println!("{}", rand);
     return Ok(rand);
 }
 
@@ -264,6 +263,12 @@ pub fn ffmpeg(format: i32, infile: String, mut fname: String) -> Result<String, 
         Ok(_) => {
             return Ok(outfile);
         },
-        Err(_) => return Err("Failed to convert media; Check format / content!".to_string()),
+        Err(_) => {
+            match fs::remove_dir_all(Path::new(&rndpath)) {
+                Ok(_) => {},
+                Err(err) => warn!("failed deleting file; reason: {}", err),
+            };
+            return Err("Failed to convert media; Check format / content!".to_string())
+        },
     };
 }

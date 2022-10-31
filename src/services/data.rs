@@ -38,15 +38,15 @@ async fn convert(form: MultipartForm<FileUpload>) -> impl Responder {
     let outfname = Path::new(&convpath).file_name().unwrap().to_str().unwrap().chars().filter(|c| c.is_ascii()).collect::<String>();
     let fasvec = match read_to_vec(convpath.clone()) {
         Ok(ok) => {
-            ok
-        },
-        Err(err) => return HttpResponse::BadRequest().json(json!({ "message":format!("Failed reading file; Reason: {}", err)}))
-    };
-    
-    
-    match fs::remove_dir_all(Path::new(&convpath).parent().unwrap()) {
+            match fs::remove_dir_all(Path::new(&convpath).parent().unwrap()) {
                 Ok(_) => {},
                 Err(err) => error!("failed deleting file; reason: {}", err),
+            };
+            ok
+        },
+        Err(err) => {
+            return HttpResponse::BadRequest().json(json!({ "message":format!("Failed reading file; Reason: {}", err)}))
+        }
     };
 
     let mut conn = match get_conn_fn() {

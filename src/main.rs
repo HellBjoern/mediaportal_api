@@ -1,7 +1,9 @@
+use std::{path::Path, fs};
+
 use actix_cors::Cors;
 use actix_easy_multipart::extractor::MultipartFormConfig;
 use actix_web::{App, HttpServer, http::header};
-use log::info;
+use log::{info, warn};
 use lazy_static::lazy_static;
 use crate::{services::{user, data}, other::{structs::Config, utility::get_conf}};
 extern crate pretty_env_logger;
@@ -27,6 +29,11 @@ lazy_static! {
 async fn main() -> std::io::Result<()> {
     pretty_env_logger::init();
     info!("Starting api on {}:{}", CONFIG.ip, CONFIG.port);
+    info!("Cleaning up tmp dir");
+    match fs::remove_dir_all(Path::new(&CONFIG.tmppath)) {
+        Ok(_) => {},
+        Err(err) => warn!("failed deleting file; reason: {}", err),
+    };
     HttpServer::new(|| {
         let cors = Cors::default()
             .allow_any_origin()
