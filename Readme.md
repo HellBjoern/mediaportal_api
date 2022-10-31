@@ -2,9 +2,14 @@
 
 ---
 
-## Setup instructions
+## Table of contents
 
-### Linux
+1. [Setup Instructions](#1-setup-instructions)
+   1. 1 [Linux](#11-linux)
+
+## 1. Setup instructions
+
+### 1.1 Linux
 
 Install required tools e.g:
 
@@ -121,21 +126,21 @@ Run with logging enabled:
 RUST_LOG=info cargo run
 ```
 
-### Windows
+### 1.2 Windows
 
 - [ ] Coming soon
 
 ---
 
-## General
+## 2. General
 
 On Success Code is 200
 
 On Error / Failure / Other Code is 400
 
-## User operations
+## 3. User operations
 
-## Login
+## 3.1 Login
 
 * Checks credentials and on success returns user + uid
 
@@ -143,7 +148,7 @@ On Error / Failure / Other Code is 400
 
 ---
 
-**Request**
+#### 3.11 Request
 
 Example Data:
 
@@ -156,7 +161,7 @@ Example Data:
 
 ---
 
-**Response**
+#### 3.12 Response
 
 Success:
 
@@ -191,7 +196,7 @@ Json deserialize error: ...
 }
 ```
 
-## Logout
+## 3.2 Logout
 
 * Logs user out
 
@@ -199,7 +204,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 3.21 Request
 
 Example Data:
 
@@ -211,7 +216,7 @@ Example Data:
 
 ---
 
-**Response**
+#### 3.22 Response
 
 Success:
 
@@ -245,7 +250,7 @@ Json deserialize error: ...
 }
 ```
 
-## Logged
+## 3.3 Logged
 
 - Checks if user is logged in
 
@@ -253,7 +258,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 3.31 Request
 
 Example Data:
 
@@ -265,7 +270,7 @@ Example Data:
 
 ---
 
-**Response**
+#### 3.32 Response
 
 Success:
 
@@ -299,7 +304,7 @@ Json deserialize error: ...
 }
 ```
 
-## Chpwd
+## 3.4 Chpwd
 
 * Changes the password for a user
 
@@ -307,7 +312,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 3.41 Request
 
 Example Data:
 
@@ -321,7 +326,7 @@ Example Data:
 
 ---
 
-**Response**
+#### 3.42 Response
 
 Success:
 
@@ -363,7 +368,7 @@ Json deserialize error: ...
 }
 ```
 
-## Add
+## 3.5 Add
 
 - Inserts user into Database
 
@@ -371,7 +376,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 3.51 Request
 
 Example Data:
 
@@ -385,7 +390,7 @@ Example Data:
 
 ---
 
-**Response**
+#### 3.52 Response
 
 Success:
 
@@ -420,7 +425,7 @@ Json deserialize error: ...
 }
 ```
 
-## Check
+## 3.6 Check
 
 - Checks if user exists in DB (ONLY FOR TESTING)(SECURITY RISK)
 
@@ -428,7 +433,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 3.61 Request
 
 Example Data:
 
@@ -440,7 +445,7 @@ Example Data:
 
 ---
 
-**Response**
+#### 3.62 Response
 
 Success:
 
@@ -468,9 +473,9 @@ Json deserialize error: ...
 
 ---
 
-## Data operations
+## 4 Data operations
 
-## YT_DL
+## 4.1 YT_DL
 
 * Downloads specified youtube uri in specific format and stores it on DB
 
@@ -478,7 +483,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 4.11 Request
 
 Example Data:
 
@@ -494,12 +499,13 @@ Example Data:
 
 ---
 
-**Response**
+#### 4.12 Response
 
 Success:
 
 ```json
 {
+    "filename": videoname,
     "message": "Successfully downloaded {uri}",
     "mid": mid
 }
@@ -561,7 +567,7 @@ Json deserialize error: ...
 }
 ```
 
-## Medialist
+## 4.2 Medialist
 
 - Returns all media linked to a user
 
@@ -569,7 +575,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 4.21 Request
 
 Example Data:
 
@@ -581,7 +587,7 @@ Example Data:
 
 ---
 
-**Response**
+#### 4.22 Response
 
 Success:
 
@@ -604,7 +610,7 @@ If no files are present, return will be:
 {}
 ```
 
-**Failure**
+Failure:
 
 - Sent invalid Json
 
@@ -628,7 +634,7 @@ Json deserialize error: ...
 }
 ```
 
-## Download
+## 4.3 Download
 
 - Responds with requested media as binary/octet-stream
 
@@ -636,7 +642,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 4.31 Request
 
 Example Data:
 
@@ -649,13 +655,13 @@ Example Data:
 
 ---
 
-**Response**
+#### 4.32 Response
 
 Success:
 
 Sends the media as octet-stream;
 
-**Failure**
+Failure:
 
 - Sent invalid Json
 
@@ -695,7 +701,7 @@ Json deserialize error: ...
 }
 ```
 
-## Convert
+## 4.4 Convert
 
 - Converts supplied media to format specified and saves it to DB
 
@@ -703,7 +709,7 @@ Json deserialize error: ...
 
 ---
 
-**Request**
+#### 4.41 Request
 
 Example Data:
 
@@ -721,7 +727,7 @@ Data expected is multipart/form
 
 ---
 
-**Response**
+#### 4.42 Response
 
 Success:
 
@@ -786,7 +792,5 @@ Json deserialize error: ...
 ```json
 {
     "message": "Supplied invalid format"
-}
+}`
 ```
-
-- 
