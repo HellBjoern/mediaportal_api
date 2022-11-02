@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
     info!("Cleaning up tmp dir");
     match fs::remove_dir_all(Path::new(&CONFIG.tmppath)) {
         Ok(_) => {},
-        Err(err) => warn!("failed deleting file; reason: {}", err),
+        Err(err) => warn!("failed deleting temp folder; reason: {}; continuing...", err),
     };
     HttpServer::new(|| {
         let cors = Cors::default()
