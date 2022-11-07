@@ -448,6 +448,14 @@ Json deserialize error: ...
 }
 ```
 
+- Email taken
+
+```json
+{
+    "message": "Email already taken!"
+}
+```
+
 - Database Error
 
 ```json
