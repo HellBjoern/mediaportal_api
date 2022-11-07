@@ -159,7 +159,7 @@ RUST_LOG=info cargo run
 
 ### 1.2 Windows
 
-- [ ] Coming soon
+- [ ] Not coming anytime soon
 
 ---
 
