@@ -3,7 +3,7 @@ use log::{warn, info, error};
 use mysql::{prelude::Queryable, params};
 use serde_json::json;
 use pwhash::bcrypt;
-use crate::other::{utility::{checkname_fn, get_conn_fn, logged_uname_fn}, structs::{Login, Username, User, Chpwd}};
+use crate::other::{utility::{checkname_fn, get_conn_fn, logged_uname_fn, checkmail_fn}, structs::{Login, Username, User, Chpwd}};
 
 //login service; takes json; responds with either code 400 on error + json msg or on success 200 + json msg
 #[post("/user/login")]
@@ -121,6 +121,19 @@ async fn add(user: web::Json<User>) -> impl Responder {
         },
         Err(err) => {
             error!("checkname_fn failed with error: {err}");
+            return HttpResponse::BadRequest().json(json!({ "message":err }))
+        },
+    };
+
+    match checkmail_fn(user.email.clone()) {
+        Ok(res) => {
+            if res {
+                warn!("tried creating user with already existing email");
+                return HttpResponse::BadRequest().json(json!({ "message":"Email already taken!" }));
+            }
+        },
+        Err(err) => {
+            error!("checkmail_fn failed with error: {err}");
             return HttpResponse::BadRequest().json(json!({ "message":err }))
         },
     };

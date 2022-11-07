@@ -21,6 +21,25 @@ pub fn get_conn_fn() -> Result<PooledConn, String> {
     };
 }
 
+//checks if email exists in database; returns true / false or string containing error on failure
+pub fn checkmail_fn(email: String) -> Result<bool, String>{
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => return Err(err),
+    };
+
+    match conn.exec_first("SELECT uemail FROM users WHERE uemail =:uemail", params! { "uemail" => &email}).map(|row: Option<String>| { row }) {
+        Ok(res) => {
+            if res.is_none() {
+                return Ok(false);
+            } else {
+                return Ok(true);
+            }
+        },
+        Err(err) => return Err(err.to_string()),
+    };
+}
+
 //checks if username exists in database; returns true / false or string containing error on failure
 pub fn checkname_fn(username: String) -> Result<bool, String>{
     let mut conn = match get_conn_fn() {
