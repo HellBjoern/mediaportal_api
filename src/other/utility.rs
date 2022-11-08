@@ -128,7 +128,7 @@ pub fn get_conf() -> Config {
                     info!("successfully loaded config file");
                     return conf
                 },
-                Err(err) => warn!("failed to parse config file, falling back to default; reason: {err}, tried loading {}", Path::new(crate::CONFPATH).display()),
+                Err(err) => warn!("failed to parse config file, falling back to default; reason: {err}, path: {}", Path::new(crate::CONFPATH).display()),
             }
         },
         Err(err) => warn!("failed to load config file, falling back to default; reason: {err}, tried loading {}", Path::new(crate::CONFPATH).display()),
