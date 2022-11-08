@@ -1,6 +1,6 @@
 use std::{path::Path, fs::{File, self}, io::Read};
 use checked_command::CheckedCommand;
-use log::{warn, info};
+use log::{warn, info, error};
 use mysql::{params, Pool, PooledConn, prelude::Queryable};
 use rand::distributions::{Alphanumeric, DistString};
 
@@ -287,6 +287,30 @@ pub fn ffmpeg(format: i32, infile: String, mut fname: String) -> Result<String, 
                 Err(err) => warn!("failed deleting file; reason: {}", err),
             };
             return Err("Failed to convert media; Check format / content!".to_string())
+        },
+    };
+}
+
+pub fn shutdown() {
+    match fs::remove_dir_all(Path::new(&CONFIG.tmppath)) {
+        Ok(_) => {},
+        Err(err) => warn!("failed deleting temp folder; reason: {}; continuing...", err),
+    };
+
+    let mut conn = match get_conn_fn() {
+        Ok(conn) => conn,
+        Err(err) => {
+            error!("get_conn_fn failed with error: {err}");
+            return;
+        },
+    };
+
+    match conn.query_drop("UPDATE users SET ulogged = 0") {
+        Ok(_) => {
+            info!("successfully logged user out");
+        },
+        Err(err) => {
+            error!("database threw error: {err}");
         },
     };
 }

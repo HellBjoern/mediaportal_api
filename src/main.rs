@@ -5,7 +5,7 @@ use actix_web::{App, HttpServer, http::header};
 use log::{info, warn};
 use lazy_static::lazy_static;
 
-use crate::{services::{user, data}, other::{structs::Config, utility::get_conf}};
+use crate::{services::{user, data}, other::{structs::Config, utility::{get_conf, shutdown}}};
 extern crate pretty_env_logger;
 
 mod services;
@@ -27,9 +27,15 @@ lazy_static! {
 */
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    ctrlc::set_handler(move || {
+        shutdown();
+    })
+    .expect("Error setting interrupt handler");
+
     pretty_env_logger::init();
     info!("Starting api on {}:{}", CONFIG.ip, CONFIG.port);
-    info!("Cleaning up tmp dir");
+    info!("Trying to clean up tmp dir");
     match fs::remove_dir_all(Path::new(&CONFIG.tmppath)) {
         Ok(_) => {},
         Err(err) => warn!("failed deleting temp folder; reason: {}; continuing...", err),
