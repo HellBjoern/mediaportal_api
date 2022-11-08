@@ -38,6 +38,7 @@ pub struct Chpwd {
 pub struct Config {
     pub ip: String,
     pub port: u16,
+    pub workers: usize,
     pub sqladd: String,
     pub sqlusr: String,
     pub sqlpwd: String,

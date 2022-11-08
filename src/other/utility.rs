@@ -136,6 +136,7 @@ pub fn get_conf() -> Config {
     return Config {
         ip: "0.0.0.0".to_string(),
         port: 8080,
+        workers: num_cpus::get(),
         sqladd: "127.0.0.1".to_string(),
         sqlusr: "user".to_string(),
         sqlpwd: "password".to_string(),

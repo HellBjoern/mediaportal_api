@@ -2,6 +2,9 @@
 ip = "0.0.0.0"
 port = 8080
 
+#number of workers for server
+workers = 2
+
 #address of sql server
 sqladd = "127.0.0.1"
 sqlprt = 3306

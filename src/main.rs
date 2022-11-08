@@ -55,6 +55,7 @@ async fn main() -> std::io::Result<()> {
             .service(data::medialist)
             .service(data::download)
     })
+    .workers(CONFIG.workers)
     .bind((CONFIG.ip.clone(), CONFIG.port))?
     .run()
     .await
