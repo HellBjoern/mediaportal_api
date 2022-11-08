@@ -1,9 +1,6 @@
 use actix_easy_multipart::{MultipartForm, tempfile::Tempfile, text::Text};
 use serde::{Deserialize, Serialize};
 
-/*
-* Structs
-*/
 #[derive(MultipartForm)]
 pub struct FileUpload {
     pub file: Vec<Tempfile>,

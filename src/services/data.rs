@@ -4,11 +4,9 @@ use actix_web::{post, Responder, web, HttpResponse};
 use log::{info, error, warn};
 use mysql::{prelude::Queryable, params};
 use serde_json::{json, Map};
+
 use crate::{other::{structs::{FileUpload, Yt, Uid, Media, Down}, utility::{read_to_vec, get_conn_fn, logged_uid_fn, checkuid_fn, ffmpeg}}, CONFIG};
 
-/*
-* Data services
-*/
 #[post("/data/convert")]
 async fn convert(form: MultipartForm<FileUpload>) -> impl Responder {
     info!("[REQ] /data/convert");

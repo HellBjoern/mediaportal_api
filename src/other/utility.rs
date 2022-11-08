@@ -6,8 +6,6 @@ use rand::distributions::{Alphanumeric, DistString};
 
 use crate::{other::{structs::Config}, SQL, CONFIG};
 
-
-
 //returns sql pooled conn or error as string to be used for error handling
 pub fn get_conn_fn() -> Result<PooledConn, String> {
     let pool = match  Pool::new(SQL.as_str()) {
