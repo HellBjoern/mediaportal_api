@@ -466,7 +466,7 @@ Json deserialize error: ...
 
 ## 3.6 Check
 
-- Checks if user exists in DB (ONLY FOR TESTING)(SECURITY RISK)
+- Checks if user exists in DB (should only be used for testing)
 
 - *ip*:*port*/user/check
 
