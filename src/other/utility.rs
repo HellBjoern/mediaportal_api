@@ -292,6 +292,9 @@ pub fn ffmpeg(format: i32, infile: String, mut fname: String) -> Result<String, 
 }
 
 pub fn shutdown() {
+    print!("\n");
+    info!("received interrupt; shutting down...");
+    
     match fs::remove_dir_all(Path::new(&CONFIG.tmppath)) {
         Ok(_) => {},
         Err(err) => warn!("failed deleting temp folder; reason: {}; continuing...", err),
