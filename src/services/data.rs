@@ -1,5 +1,5 @@
 use std::{fs, path::Path};
-use actix_easy_multipart::extractor::MultipartForm;
+use actix_easy_multipart::MultipartForm;
 use actix_web::{post, Responder, web, HttpResponse};
 use log::{info, error, warn};
 use mysql::{prelude::Queryable, params};
@@ -26,8 +26,15 @@ async fn convert(form: MultipartForm<FileUpload>) -> impl Responder {
             return HttpResponse::BadRequest().json(json!({ "message":err }));
         }
     };
-    
-    let convpath = match ffmpeg(form.format, form.file.file.path().to_str().unwrap().to_string(), form.file.filename.as_ref().unwrap().to_string()) {
+
+    let recfile = match form.file.first().take() {
+        Some(ok) => ok,
+        None => {
+            return HttpResponse::BadRequest().json(json!({ "message":"Received invalid file field!"}));
+        }
+    };
+
+    let convpath = match ffmpeg(form.format.0, recfile.file.path().to_str().unwrap().to_string(), recfile.file_name.as_ref().unwrap().to_string()) {
         Ok(ok) => ok,
         Err(err) => {
             error!("ffmpeg conversion failed; reason: {}", err);
@@ -57,7 +64,7 @@ async fn convert(form: MultipartForm<FileUpload>) -> impl Responder {
         },
     };
 
-    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (form.uid, &fasvec, outfname.clone(), form.format)) {
+    match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (form.uid.0, &fasvec, outfname.clone(), form.format.0)) {
         Ok(_) => {
             match conn.query_first("SELECT mid FROM media WHERE mtimestamp = (SELECT MAX(mtimestamp) FROM media)").map(|row: Option<i32>| { row.unwrap() }) {
                 Ok(ret) => {

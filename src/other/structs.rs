@@ -1,14 +1,14 @@
-use actix_easy_multipart::{FromMultipart, File};
+use actix_easy_multipart::{MultipartForm, tempfile::Tempfile, text::Text};
 use serde::{Deserialize, Serialize};
 
 /*
 * Structs
 */
-#[derive(FromMultipart)]
+#[derive(MultipartForm)]
 pub struct FileUpload {
-    pub file: File,
-    pub format: i32,
-    pub uid: i32
+    pub file: Vec<Tempfile>,
+    pub format: Text<i32>,
+    pub uid: Text<i32>
 }
 
 #[derive(Deserialize)]

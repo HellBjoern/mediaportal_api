@@ -1,7 +1,7 @@
 use std::{path::Path, fs};
 
 use actix_cors::Cors;
-use actix_easy_multipart::extractor::MultipartFormConfig;
+use actix_easy_multipart::MultipartFormConfig;
 use actix_web::{App, HttpServer, http::header};
 use log::{info, warn};
 use lazy_static::lazy_static;
@@ -43,7 +43,7 @@ async fn main() -> std::io::Result<()> {
             .max_age(3600);
         App::new()
             .wrap(cors)
-            .app_data(MultipartFormConfig::default().file_limit(100 * 1024 * 1024 * 1024))
+            .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024 * 1024))
             .service(user::add)
             .service(user::login)
             .service(user::logout)
