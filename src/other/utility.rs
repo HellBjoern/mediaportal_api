@@ -143,6 +143,9 @@ pub fn get_conf() -> Config {
         sqlprt: 3306,
         sqldab: "mediaportal".to_string(),
         tmppath: "./tmp/".to_string(),
+        ssl: false,
+        cert: "./cert.pem".to_string(),
+        key: "./key.pem".to_string()
     }
 }
 

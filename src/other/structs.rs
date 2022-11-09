@@ -44,7 +44,10 @@ pub struct Config {
     pub sqlpwd: String,
     pub sqlprt: u16,
     pub sqldab: String,
-    pub tmppath: String
+    pub tmppath: String,
+    pub ssl: bool,
+    pub cert: String,
+    pub key: String
 }
 
 #[derive(Deserialize)]
