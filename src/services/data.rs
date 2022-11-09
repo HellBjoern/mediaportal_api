@@ -62,6 +62,7 @@ async fn convert(form: MultipartForm<FileUpload>) -> impl Responder {
         },
     };
 
+    info!("trying to insert {}mb into db", (fasvec.len()/(1024*1024)));
     match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (form.uid.0, &fasvec, outfname.clone(), form.format.0)) {
         Ok(_) => {
             match conn.query_first("SELECT mid FROM media WHERE mtimestamp = (SELECT MAX(mtimestamp) FROM media)").map(|row: Option<i32>| { row.unwrap() }) {
@@ -106,7 +107,7 @@ async fn medialist(user: web::Json<Uid>) -> impl Responder {
         },
     };
 
-
+    info!("trying to fetch mediafiles from db");
     let media = match conn.exec_map("SELECT mid, mname, mformat FROM media WHERE uid =:uid", params! {"uid" => user.uid }, |(mid, mname, mformat)| Media { mid, mname, mformat }) {
         Ok(ok) => ok,
         Err(err) => {
@@ -175,6 +176,7 @@ async fn yt_dl(down: web::Json<Yt>) -> impl Responder {
         },
     };
 
+    info!("trying to send {}mb to db", (file.len()/(1024*1024)));
     match conn.exec_drop("INSERT INTO media(uid, mmedia, mname, mformat) VALUES (?, ?, ?, ?)", (down.uid, &file, mname.clone(), down.format)) {
         Ok(_) => {
             match conn.query_first("SELECT mid FROM media WHERE mtimestamp = (SELECT MAX(mtimestamp) FROM media)").map(|row: Option<i32>| { row.unwrap() }) {
@@ -221,6 +223,7 @@ async fn download(down: web::Json<Down>) -> impl Responder {
         },
     };
 
+    info!("trying to fetch files from db");
     match conn.exec_first("SELECT mmedia FROM media WHERE uid =:uid AND mid =:mid", params! { "uid" => down.uid, "mid" => down.mid }).map(|row: Option<Vec<u8>>| { row }) {
         Ok(ret) => {
             match ret {
