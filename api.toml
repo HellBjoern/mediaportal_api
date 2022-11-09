@@ -2,6 +2,8 @@
 ip = "0.0.0.0"
 port = 8080
 ssl = true
+cert ="cert.pem"
+key = "key.pem"
 
 #number of workers for server
 workers = 2

@@ -51,7 +51,7 @@ async fn main() -> std::io::Result<()> {
             info!("loaded key file; continuing...");
         },
         Err(_) => {
-            warn!("could not load key file! starting without ssl");
+            warn!("could not load key file!");
             continute = false;
         }
     }
@@ -61,13 +61,13 @@ async fn main() -> std::io::Result<()> {
                 info!("loaded cert file; continuing...");
             },
             Err(_) => {
-                warn!("could not load cert file! starting without ssl");
+                warn!("could not load cert file!");
                 continute = false;
             },
         }
     }
 
-    if continute {
+    if continute && CONFIG.ssl {
         info!("trying to start with ssl enabled...");
         
         HttpServer::new(|| {
