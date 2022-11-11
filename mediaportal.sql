@@ -3,7 +3,7 @@
 --
 -- Host: 127.0.0.1    Database: mediaportal
 -- ------------------------------------------------------
--- Server version	10.9.3-MariaDB
+-- Server version       10.9.3-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -28,12 +28,12 @@ CREATE TABLE `media` (
   `uid` int(11) NOT NULL,
   `mtimestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `mmedia` longblob NOT NULL,
-  `mname` varchar(124) COLLATE latin1_german1_ci NOT NULL,
+  `mname` varchar(124) COLLATE utf8mb4_general_ci NOT NULL,
   `mformat` int(11) NOT NULL,
   PRIMARY KEY (`mid`),
   KEY `uid` (`uid`),
   CONSTRAINT `media_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,13 +45,13 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
-  `uusername` varchar(30) COLLATE latin1_german1_ci NOT NULL,
-  `uemail` varchar(50) COLLATE latin1_german1_ci NOT NULL,
-  `upassword` varchar(100) COLLATE latin1_german1_ci NOT NULL,
+  `uusername` varchar(30) COLLATE utf8mb4_general_ci NOT NULL,
+  `uemail` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `upassword` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `ulogged` tinyint(4) DEFAULT 0,
   PRIMARY KEY (`uid`),
   UNIQUE KEY `uusername` (`uusername`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_german1_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
