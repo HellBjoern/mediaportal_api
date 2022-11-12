@@ -205,6 +205,8 @@ pub fn read_to_vec(path: String) -> Result<Vec<u8>, String> {
         Err(err) => return Err(format!("failed to read file; reason: {}", err)),
     };
 
+    std::mem::forget(file);
+
     return Ok(data);
 }
 
