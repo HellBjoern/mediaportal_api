@@ -1,7 +1,7 @@
 use std::{path::Path, fs};
 use actix_cors::Cors;
 use actix_easy_multipart::MultipartFormConfig;
-use actix_web::{App, HttpServer, http::header};
+use actix_web::{App, HttpServer, http::header, middleware::Logger};
 use log::{info, warn};
 use lazy_static::lazy_static;
 use openssl::ssl::{SslAcceptor, SslMethod, SslFiletype};
@@ -71,7 +71,8 @@ async fn main() -> std::io::Result<()> {
     if continute && CONFIG.ssl {
         info!("trying to start with ssl enabled...");
         
-        HttpServer::new(|| {
+        HttpServer::new( move || {
+            let logger = Logger::default();
             let cors = Cors::default()
                 .allow_any_origin()
                 .allowed_methods(vec!["GET", "POST"])
@@ -80,6 +81,7 @@ async fn main() -> std::io::Result<()> {
                 .max_age(3600);
             App::new()
                 .wrap(cors)
+                .wrap(logger)
                 .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024 * 1024))
                 .service(user::add)
                 .service(user::login)
@@ -98,7 +100,8 @@ async fn main() -> std::io::Result<()> {
         .await
     } else {
         info!("trying to start without ssl...");
-        HttpServer::new(|| {
+        HttpServer::new( move || {
+            let logger = Logger::default();
             let cors = Cors::default()
                 .allow_any_origin()
                 .allowed_methods(vec!["GET", "POST"])
@@ -107,6 +110,7 @@ async fn main() -> std::io::Result<()> {
                 .max_age(3600);
             App::new()
                 .wrap(cors)
+                .wrap(logger)
                 .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024 * 1024))
                 .service(user::add)
                 .service(user::login)
