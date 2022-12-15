@@ -1,37 +1,37 @@
-use actix_easy_multipart::{MultipartForm, tempfile::Tempfile, text::Text};
+use actix_easy_multipart::{tempfile::Tempfile, text::Text, MultipartForm};
 use serde::{Deserialize, Serialize};
 
 #[derive(MultipartForm)]
 pub struct FileUpload {
     pub file: Vec<Tempfile>,
     pub format: Text<i32>,
-    pub uid: Text<i32>
+    pub uid: Text<i32>,
 }
 
 #[derive(Deserialize)]
 pub struct User {
     pub username: String,
     pub email: String,
-    pub password: String
+    pub password: String,
 }
 
 #[derive(Deserialize, Clone)]
 pub struct Login {
     pub id: Option<i32>,
     pub username: String,
-    pub password: String
+    pub password: String,
 }
 
 #[derive(Deserialize)]
 pub struct Username {
-    pub username: String
+    pub username: String,
 }
 
 #[derive(Deserialize)]
 pub struct Chpwd {
     pub username: String,
     pub oldpwd: String,
-    pub newpwd: String
+    pub newpwd: String,
 }
 
 #[derive(Deserialize)]
@@ -47,30 +47,30 @@ pub struct Config {
     pub tmppath: String,
     pub ssl: bool,
     pub cert: String,
-    pub key: String
+    pub key: String,
 }
 
 #[derive(Deserialize)]
 pub struct Yt {
     pub uid: i32,
     pub uri: String,
-    pub format: i32
+    pub format: i32,
 }
 
 #[derive(Deserialize, Debug, Serialize)]
 pub struct Media {
     pub mid: i32,
     pub mname: String,
-    pub mformat: i32
+    pub mformat: i32,
 }
 
-# [derive(Deserialize)]
+#[derive(Deserialize)]
 pub struct Uid {
-    pub uid: i32
+    pub uid: i32,
 }
 
 #[derive(Deserialize)]
 pub struct Down {
     pub uid: i32,
-    pub mid: i32
+    pub mid: i32,
 }
